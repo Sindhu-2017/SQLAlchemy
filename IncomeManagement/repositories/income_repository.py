@@ -22,7 +22,6 @@ class IncomeRepository:
         count_statement = select(func.count()).select_from(statement.order_by(None).subquery())
 
         total = self.db.scalar(count_statement) or 0
-
         offset = (page - 1) * page_size
 
         statement = (statement.order_by(Income.income_id).offset(offset).limit(page_size))
@@ -32,7 +31,6 @@ class IncomeRepository:
     def update(self, income: Income) -> Income:
         self.db.flush()
         self.db.refresh(income)
-
         return income
 
     def delete(self, income: Income) -> None:

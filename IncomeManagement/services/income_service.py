@@ -10,7 +10,6 @@ from exceptions.income_exceptions import (
     InvalidIncomeOperationError,
 )
 class IncomeService:
-
     def __init__(self, db: Session):
         self.db = db
         self.repository = IncomeRepository(db)
@@ -20,7 +19,6 @@ class IncomeService:
         tax_amount = amount * tax_percentage / Decimal("100")
         net_income = amount - tax_amount
         cash_in_hand = net_income - expense_amount
-
         if expense_amount < 0 or cash_in_hand < 0:
             raise InvalidIncomeOperationError("Expenses cannot exceed net income.")
 
@@ -30,7 +28,6 @@ class IncomeService:
         tax_amount, net_income, cash_in_hand = (
             self.calculate_income(data.amount,data.tax_percentage, data.expense_amount)
         )
-
         income = Income(
             income_date=data.income_date,
             source=data.source,
@@ -43,13 +40,11 @@ class IncomeService:
             cash_in_hand=cash_in_hand,
             description=data.description,
         )
-
         try:
             self.repository.create(income)
             self.db.commit()
             self.db.refresh(income)
             return income
-
         except Exception:
             self.db.rollback()
             raise
@@ -58,7 +53,6 @@ class IncomeService:
         income = self.repository.get_by_id(income_id)
         if income is None:
             raise IncomeNotFoundError(f"Income with ID {income_id} was not found.")
-
         return income
 
     def get_incomes(self,page: int,page_size: int,income_name: str | None = None) -> dict:
@@ -79,12 +73,11 @@ class IncomeService:
             }
         }
 
-    def update_income(self,income_id: int,data: IncomeUpdate ) -> Income:
+    def update_income(self,income_id: int,data: IncomeUpdate) -> Income:
         income = self.get_income(income_id)
         tax_amount, net_income, cash_in_hand = (
             self.calculate_income(data.amount,data.tax_percentage,income.expense_amount)
         )
-
         changes = data.model_dump()
 
         changes["tax_amount"] = tax_amount
@@ -98,7 +91,6 @@ class IncomeService:
             self.repository.update(income)
             self.db.commit()
             self.db.refresh(income)
-
             return income
 
         except Exception:
@@ -110,7 +102,6 @@ class IncomeService:
         changes = data.model_dump(exclude_unset=True)
         if not changes:
             raise InvalidIncomeOperationError("Provide at least one field to update.")
-
         for field, value in changes.items():
             if value is None and field != "description":
                 raise InvalidIncomeOperationError(

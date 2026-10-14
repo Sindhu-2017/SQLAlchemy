@@ -5,7 +5,7 @@ from fastapi import (
     HTTPException,
     Path,
     Query,
-    status,
+    status
 )
 from sqlalchemy.orm import Session
 
@@ -35,17 +35,14 @@ def get_income_service(db: Session = Depends(get_database)) -> IncomeService:
     return IncomeService(db)
 
 
-IncomeServiceDependency = Annotated[
-    IncomeService,
-    Depends(get_income_service),
-]
+IncomeServiceDependency = Annotated[IncomeService,Depends(get_income_service)]
 
 
 @router.get("/",response_model=IncomePaginatedResponse)
 def get_all_income(
     service: IncomeServiceDependency,
     page: Annotated[int, Query(ge=1)] = 1,
-    page_size: Annotated[int, Query(ge=1, le=100)] = 10,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 5,
     income_name: Annotated[str | None,Query(min_length=1)] = None
 ):
     return service.get_incomes(page=page,page_size=page_size,income_name=income_name)
@@ -107,7 +104,6 @@ def patch_income(
 ):
     try:
         return service.patch_income(income_id, data)
-
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -127,7 +123,6 @@ def delete_income(
 ):
     try:
         service.delete_income(income_id)
-
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

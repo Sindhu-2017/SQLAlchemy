@@ -28,6 +28,5 @@ app.include_router(income_router)
 @app.get("/", tags=["Root"])
 def home():
     return {
-        "message": "Income Management API is running",
-        "documentation": "/docs",
+        "message": "Income Management API is running"
     }
