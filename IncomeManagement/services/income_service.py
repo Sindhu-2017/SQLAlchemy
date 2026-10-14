@@ -52,7 +52,7 @@ class IncomeService:
     def get_income(self, income_id: int) -> Income:
         income = self.repository.get_by_id(income_id)
         if income is None:
-            raise IncomeNotFoundError(f"Income with ID {income_id} was not found.")
+            raise IncomeNotFoundError(income_id)
         return income
 
     def get_incomes(self,page: int,page_size: int,income_name: str | None = None) -> dict:
