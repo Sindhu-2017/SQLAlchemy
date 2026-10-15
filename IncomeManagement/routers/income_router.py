@@ -36,9 +36,7 @@ router = APIRouter(
 def get_income_service(db: Session = Depends(get_database)) -> IncomeService:
     return IncomeService(db)
 
-
 IncomeServiceDependency = Annotated[IncomeService,Depends(get_income_service)]
-
 
 @router.get("/",response_model=IncomePaginatedResponse)
 def get_all_income(
@@ -59,14 +57,14 @@ def get_one_income(
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
 
 @router.post("/",response_model=IncomeResponse,status_code=status.HTTP_201_CREATED)
 def create_income(
     data: IncomeCreate,
-    service: IncomeServiceDependency,
+    service: IncomeServiceDependency
 ):
     try:
         return service.create_income(data)
@@ -74,7 +72,7 @@ def create_income(
     except InvalidIncomeOperationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
 @router.put("/{income_id}",response_model=IncomeResponse)
@@ -89,33 +87,33 @@ def update_income(
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
     except InvalidIncomeOperationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
 @router.patch("/{income_id}",response_model=IncomeResponse)
 def patch_income(
     income_id: Annotated[int, Path(gt=0)],
     data: IncomePatch,
-    service: IncomeServiceDependency,
+    service: IncomeServiceDependency
 ):
     try:
         return service.patch_income(income_id, data)
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
     except InvalidIncomeOperationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
 @router.delete("/{income_id}",status_code=status.HTTP_204_NO_CONTENT)
@@ -128,7 +126,7 @@ def delete_income(
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
 
@@ -137,7 +135,7 @@ def delete_income(
 async def upload_income_file(
     income_id: int,
     service: IncomeServiceDependency,
-    file: UploadFile = File(...),
+    file: UploadFile = File(...)
 ):
     try:
         return await service.upload_income_file(income_id=income_id,file=file)
@@ -145,11 +143,11 @@ async def upload_income_file(
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=404,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc
 
     except InvalidIncomeOperationError as exc:
         raise HTTPException(
             status_code=422,
-            detail=str(exc),
+            detail=str(exc)
         ) from exc

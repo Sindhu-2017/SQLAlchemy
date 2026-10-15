@@ -1,7 +1,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-
 from models.income import Income
+
 class IncomeRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -18,7 +18,7 @@ class IncomeRepository:
     def get_all(self,page: int,page_size: int, income_name: str | None = None) -> tuple[list[Income], int]:
         statement = select(Income)
         if income_name:
-            statement = statement.where(Income.source.ilike(f"%{income_name.strip()}%"))
+            statement = statement.where(Income.source.ilike(f"{income_name.strip()}%"))
         count_statement = select(func.count()).select_from(statement.order_by(None).subquery())
 
         total = self.db.scalar(count_statement) or 0

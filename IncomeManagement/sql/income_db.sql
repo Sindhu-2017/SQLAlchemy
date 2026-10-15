@@ -9,7 +9,8 @@ CREATE TABLE income (
     expense_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
     net_income NUMERIC(12,2) NOT NULL,
     cash_in_hand NUMERIC(12,2) NOT NULL,
-    description TEXT
+    description TEXT,
+    file_path VARCHAR(500) 
 );
 
 INSERT INTO income (
@@ -45,7 +46,3 @@ VALUES
     35000, 8, 2800, 5000, 32200, 27200,
     'Logo design project'
 );
-
-
-ALTER TABLE public.income
-ADD COLUMN IF NOT EXISTS file_path VARCHAR(500);

@@ -18,9 +18,7 @@ from exceptions.income_exceptions import (
 
 class IncomeService:
 
-    BASE_UPLOAD_DIR = (
-        Path(__file__).resolve().parent.parent/ "uploads"/ "income"
-    )
+    BASE_UPLOAD_DIR = (Path(__file__).resolve().parent.parent/ "uploads"/ "income")
     ALLOWED_FILE_TYPES = {
         "application/pdf": ".pdf",
         "image/jpeg": ".jpg",
@@ -40,9 +38,7 @@ class IncomeService:
         cash_in_hand = net_income - expense_amount
 
         if expense_amount < 0 or cash_in_hand < 0:
-            raise InvalidIncomeOperationError(
-                "Expenses cannot exceed net income."
-            )
+            raise InvalidIncomeOperationError("Expenses cannot exceed net income." )
         return tax_amount, net_income, cash_in_hand
 
     def create_income(self, data: IncomeCreate) -> Income:
@@ -195,9 +191,7 @@ class IncomeService:
                         )
                     await output.write(chunk)
 
-            relative_path = destination.relative_to(
-                self.BASE_UPLOAD_DIR.parent.parent
-            ).as_posix()
+            relative_path = destination.relative_to(self.BASE_UPLOAD_DIR.parent.parent).as_posix()
 
             try:
                 self.repository.update_file_path(income=income,file_path=relative_path)

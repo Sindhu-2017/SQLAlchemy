@@ -18,7 +18,6 @@ class IncomeCreate(BaseModel):
         value = value.strip()
         if not value:
             raise ValueError("This field cannot be blank.")
-
         return value
 
 
@@ -41,13 +40,11 @@ class IncomePatch(BaseModel):
         value = value.strip()
         if not value:
             raise ValueError("This field cannot be blank.")
-
         return value
 
 
 class IncomeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     income_id: int
     income_date: date
     source: str

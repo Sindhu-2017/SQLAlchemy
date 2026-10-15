@@ -8,7 +8,6 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASSWORD: str
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -25,8 +24,7 @@ class Settings(BaseSettings):
             port=self.DB_PORT,
             database=self.DB_NAME,
         )
-
-
+    
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
