@@ -45,3 +45,7 @@ VALUES
     35000, 8, 2800, 5000, 32200, 27200,
     'Logo design project'
 );
+
+
+ALTER TABLE public.income
+ADD COLUMN IF NOT EXISTS file_path VARCHAR(500);

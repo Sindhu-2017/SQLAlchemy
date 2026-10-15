@@ -23,7 +23,11 @@ from services.income_service import (
     IncomeNotFoundError,
     InvalidIncomeOperationError
 )
+import os
+from pathlib import Path
+from uuid import uuid4
 
+from fastapi import File, UploadFile
 
 router = APIRouter(
     prefix="/api/income",
@@ -128,3 +132,65 @@ def delete_income(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         ) from exc
+
+
+
+UPLOAD_DIR = Path("uploads/income")
+ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".webp"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+
+@router.post("/{income_id}/upload")
+async def upload_income_file(
+    income_id: int,
+    service: IncomeServiceDependency,
+    file: UploadFile = File(...),
+):
+    extension = Path(file.filename or "").suffix.lower()
+
+    if extension not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF, JPG, JPEG, PNG and WEBP files are allowed.",
+        )
+
+    income = service.get_income(income_id)
+
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+    saved_filename = f"{uuid4().hex}{extension}"
+    file_path = UPLOAD_DIR / saved_filename
+
+    try:
+        content = await file.read(MAX_FILE_SIZE + 1)
+
+        if len(content) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail="File size must not exceed 5 MB.",
+            )
+
+        with file_path.open("wb") as uploaded_file:
+            uploaded_file.write(content)
+
+        income.file_path = str(file_path).replace("\\", "/")
+
+        service.db.commit()
+        service.db.refresh(income)
+
+        return {
+            "message": "File uploaded successfully.",
+            "income_id": income.income_id,
+            "file_path": income.file_path,
+        }
+
+    except Exception:
+        service.db.rollback()
+
+        if file_path.exists():
+            file_path.unlink()
+
+        raise
+
+    finally:
+        await file.close()

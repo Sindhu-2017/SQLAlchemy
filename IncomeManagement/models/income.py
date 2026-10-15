@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import Date,Integer,VARCHAR,Numeric,Text
+from sqlalchemy import Date,Integer,VARCHAR,Numeric,Text,String
 from sqlalchemy.orm import Mapped,mapped_column
 from database.base import Base
 
@@ -29,3 +29,5 @@ class Income(Base):
     cash_in_hand:Mapped[Decimal] = mapped_column(Numeric(12,2),nullable=False,default=Decimal("0"))
 
     description:Mapped[str|None] = mapped_column(Text,nullable=True)
+
+    file_path: Mapped[str | None] = mapped_column(String(500),nullable=True)

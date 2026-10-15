@@ -59,6 +59,7 @@ class IncomeResponse(BaseModel):
     net_income: Decimal
     cash_in_hand: Decimal
     description: str | None = None
+    file_path: str | None = None
 
 
 class IncomeActionResponse(BaseModel):
