@@ -80,3 +80,8 @@ class IncomePagination(BaseModel):
 class IncomePaginatedResponse(BaseModel):
     records: list[IncomeResponse]
     pagination: IncomePagination
+
+class IncomeFileUploadResponse(BaseModel):
+    message: str
+    income_id: int
+    file_path: str

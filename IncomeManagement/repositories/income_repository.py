@@ -36,3 +36,11 @@ class IncomeRepository:
     def delete(self, income: Income) -> None:
         self.db.delete(income)
         self.db.flush()
+
+    
+    def update_file_path(self,income: Income,file_path: str) -> Income:
+        income.file_path = file_path
+        self.db.flush()
+        self.db.refresh(income)
+        return income
+
