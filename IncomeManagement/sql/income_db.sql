@@ -46,3 +46,32 @@ VALUES
     35000, 8, 2800, 5000, 32200, 27200,
     'Logo design project'
 );
+
+
+
+CREATE OR REPLACE PROCEDURE update_income_expense(
+    IN p_income_id INTEGER,
+    IN p_expense_amount NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF p_expense_amount < 0 THEN
+        RAISE EXCEPTION 'Expense amount cannot be negative.';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM income
+        WHERE income_id = p_income_id
+    ) THEN
+        RAISE EXCEPTION 'Income with ID % was not found.',p_income_id;
+    END IF;
+
+    UPDATE income
+    SET
+        expense_amount = p_expense_amount,
+        cash_in_hand = net_income - p_expense_amount
+    WHERE income_id = p_income_id;
+END;
+$$;

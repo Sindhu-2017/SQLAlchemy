@@ -7,8 +7,10 @@ from fastapi import (
     Query,
     status,
     File, 
-    UploadFile
+    UploadFile,
+    Body
 )
+from decimal import Decimal
 from sqlalchemy.orm import Session
 
 from dependencies.database import get_database
@@ -114,6 +116,27 @@ def patch_income(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(exc)
+        ) from exc
+
+
+@router.patch("/{income_id}/expense",response_model=IncomeResponse)
+def update_income_expense(
+    income_id: int,
+    expense_amount: Decimal = Body(embed=True, ge=0),
+    service: IncomeServiceDependency = None,
+):
+    try:
+        return service.update_expense_using_procedure(income_id=income_id,expense_amount=expense_amount)
+    except IncomeNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+
+    except InvalidIncomeOperationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
         ) from exc
 
 @router.delete("/{income_id}",status_code=status.HTTP_204_NO_CONTENT)

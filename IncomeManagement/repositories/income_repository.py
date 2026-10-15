@@ -1,4 +1,4 @@
-from sqlalchemy import func, select
+from sqlalchemy import func, select,text
 from sqlalchemy.orm import Session
 from models.income import Income
 
@@ -32,6 +32,18 @@ class IncomeRepository:
         self.db.flush()
         self.db.refresh(income)
         return income
+
+    
+    def update_expense_using_procedure(self,income_id: int,expense_amount: Decimal) -> None:
+        self.db.execute(
+            text(
+                """
+                CALL update_income_expense(:income_id,:expense_amount)
+                """
+            ),
+            {"income_id": income_id,"expense_amount": expense_amount},
+        )
+
 
     def delete(self, income: Income) -> None:
         self.db.delete(income)

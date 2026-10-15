@@ -150,6 +150,23 @@ class IncomeService:
             self.db.rollback()
             raise
 
+    
+    def update_expense_using_procedure(self,income_id: int,expense_amount: Decimal) -> Income:
+        if expense_amount < 0:
+            raise InvalidIncomeOperationError("Expense amount cannot be negative.")
+        income = self.get_income(income_id)
+
+        try:
+            self.repository.update_expense_using_procedure(income_id=income_id,expense_amount=expense_amount)
+            self.db.commit()
+            self.db.refresh(income)
+            return income
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+
     def delete_income(self, income_id: int) -> None:
         income = self.get_income(income_id)
         try:
