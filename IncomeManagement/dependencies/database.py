@@ -1,6 +1,10 @@
-from fastapi import Depends
+from database.connection import SessionLocal
 from sqlalchemy.orm import Session
-from database.session import get_db
+from collections.abc import Generator
 
-def get_database(db: Session = Depends(get_db)):
-    yield db
+def get_database() -> Generator[Session,None,None ]:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

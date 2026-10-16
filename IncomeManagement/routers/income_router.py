@@ -139,13 +139,14 @@ def update_income_expense(
             detail=str(exc),
         ) from exc
 
-@router.delete("/{income_id}",status_code=status.HTTP_204_NO_CONTENT)
+
+@router.delete("/{income_id}")
 def delete_income(
     income_id: Annotated[int, Path(gt=0)],
     service: IncomeServiceDependency
 ):
     try:
-        service.delete_income(income_id)
+        return service.delete_income(income_id)
     except IncomeNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

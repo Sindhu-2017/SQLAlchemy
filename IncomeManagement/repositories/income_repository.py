@@ -1,6 +1,11 @@
 from sqlalchemy import func, select,text
 from sqlalchemy.orm import Session
 from models.income import Income
+from decimal import Decimal
+from exceptions.income_exceptions import (
+    IncomeNotFoundError,
+    InvalidIncomeOperationError
+)
 
 class IncomeRepository:
     def __init__(self, db: Session):
@@ -35,6 +40,12 @@ class IncomeRepository:
 
     
     def update_expense_using_procedure(self,income_id: int,expense_amount: Decimal) -> None:
+        income = self.get_by_id(income_id)
+        if expense_amount > income.net_income:
+            raise InvalidIncomeOperationError(
+                "Expense amount cannot exceed net income"
+            )
+        
         self.db.execute(
             text(
                 """

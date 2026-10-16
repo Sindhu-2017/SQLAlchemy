@@ -1,4 +1,3 @@
-
 from decimal import Decimal
 from pathlib import Path
 from uuid import uuid4
@@ -17,7 +16,6 @@ from exceptions.income_exceptions import (
 )
 
 class IncomeService:
-
     BASE_UPLOAD_DIR = (Path(__file__).resolve().parent.parent/ "uploads"/ "income")
     ALLOWED_FILE_TYPES = {
         "application/pdf": ".pdf",
@@ -167,12 +165,14 @@ class IncomeService:
             raise
 
 
-    def delete_income(self, income_id: int) -> None:
+    def delete_income(self, income_id: int) -> dict:
         income = self.get_income(income_id)
         try:
             self.repository.delete(income)
-            self.db.commit()
-
+            self.db.commit()      
+            return {
+                "message" : "Income data deleted successfully"
+            }      
         except Exception:
             self.db.rollback()
             raise

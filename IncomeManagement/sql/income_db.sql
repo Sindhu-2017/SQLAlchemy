@@ -49,7 +49,7 @@ VALUES
 
 
 
-CREATE OR REPLACE PROCEDURE update_income_expense(
+CREATE PROCEDURE update_income_expense(
     IN p_income_id INTEGER,
     IN p_expense_amount NUMERIC
 )
