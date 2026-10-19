@@ -51,10 +51,7 @@ class ExpenseService:
         )
 
         if not expense.expense_name:
-            raise InvalidIncomeOperationError(
-                "Expense name cannot be blank."
-            )
-
+            raise InvalidIncomeOperationError("Expense name cannot be blank.")
         try:
             self.expense_repository.create(expense)
             self.recalculate_income(income)
@@ -86,7 +83,6 @@ class ExpenseService:
         expense = self.get_expense(expense_id)
         income = self.get_income(expense.income_id)
         changes = data.model_dump(exclude_unset=True)
-
         if not changes:
             raise InvalidIncomeOperationError("Provide at least one field to update.")
         if any(
