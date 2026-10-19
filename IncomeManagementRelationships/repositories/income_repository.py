@@ -1,5 +1,5 @@
 from sqlalchemy import select,func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,selectinload
 from models.income_expense import Income
 
 class IncomeRepository:
@@ -20,4 +20,27 @@ class IncomeRepository:
         return records, total
 
     def get_by_id(self, income_id: int) -> Income | None:
-            return self.db.get(Income, income_id)
+        return self.db.get(Income, income_id)
+
+    def create(self, income: Income) -> Income:
+        self.db.add(income)
+        self.db.flush()
+        self.db.refresh(income)
+        return income
+
+    def update(self, income: Income) -> Income:
+        self.db.flush()
+        self.db.refresh(income)
+        return income
+
+    def delete(self, income: Income) -> None:
+        self.db.delete(income)
+        self.db.flush()
+
+    def get_by_id(self, income_id: int) -> Income | None:
+        statement = (
+            select(Income)
+            .options(selectinload(Income.expenses))
+            .where(Income.income_id == income_id)
+        )
+        return self.db.scalars(statement).first()

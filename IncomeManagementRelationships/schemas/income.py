@@ -56,13 +56,10 @@ class IncomeResponse(BaseModel):
     net_income: Decimal
     cash_in_hand: Decimal
     description: str | None = None
-    file_path: str | None = None
-
 
 class IncomeActionResponse(BaseModel):
     message: str
     income_id: int
-
 
 class IncomePagination(BaseModel):
     total_records: int
@@ -78,7 +75,3 @@ class IncomePaginatedResponse(BaseModel):
     records: list[IncomeResponse]
     pagination: IncomePagination
 
-class IncomeFileUploadResponse(BaseModel):
-    message: str
-    income_id: int
-    file_path: str

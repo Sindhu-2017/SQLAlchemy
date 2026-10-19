@@ -18,9 +18,16 @@ from schemas.income import (
     IncomeUpdate,
     IncomePatch,
     IncomeResponse,
+    IncomePaginatedResponse
+)
+
+from schemas.income import (
+    IncomeCreate,
+    IncomeUpdate,
+    IncomePatch,
+    IncomeResponse,
     IncomeActionResponse,
-    IncomePaginatedResponse,
-    IncomeFileUploadResponse
+    IncomePaginatedResponse
 )
 
 from exceptions.income_exceptions import(
@@ -60,3 +67,76 @@ def get_one_income(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err)
         ) 
+
+
+@router.post("/",response_model=IncomeResponse,status_code=status.HTTP_201_CREATED)
+def create_income(
+    data: IncomeCreate,
+    service: IncomeServiceDependency
+):
+    try:
+        return service.create_income(data)
+
+    except InvalidIncomeOperationError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(err)
+        )
+
+@router.put("/{income_id}",response_model=IncomeResponse)
+def update_income(
+    income_id: Annotated[int, Path(gt=0)],
+    data: IncomeUpdate,
+    service: IncomeServiceDependency
+):
+    try:
+        return service.update_income(income_id, data)
+    except IncomeNotFoundError as err:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(err)
+        ) from err
+
+    except InvalidIncomeOperationError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(err)
+        )
+
+@router.patch("/{income_id}",response_model=IncomeResponse)
+def patch_income(
+    income_id: Annotated[int, Path(gt=0)],
+    data: IncomePatch,
+    service: IncomeServiceDependency
+):
+    try:
+        return service.patch_income(income_id, data)
+    except IncomeNotFoundError as err:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(err)
+        )
+
+    except InvalidIncomeOperationError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(err)
+        )
+
+
+@router.delete("/{income_id}")
+def delete_income(
+    income_id: Annotated[int, Path(gt=0)],
+    service: IncomeServiceDependency
+):
+    try:
+        return service.delete_income(income_id)
+    except IncomeNotFoundError as err:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(err)
+        ) 
+
+@router.get("/reports/inner-join")
+def get_income_expenses_inner_join(service: IncomeServiceDependency):
+    return service.get_income_expenses_inner_join()
