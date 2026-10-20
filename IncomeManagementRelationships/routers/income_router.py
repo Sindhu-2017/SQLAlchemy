@@ -5,8 +5,7 @@ from fastapi import (
     HTTPException,
     Path,
     Query,
-    status,
-    Body
+    status
 )
 from decimal import Decimal
 from sqlalchemy.orm import Session
@@ -25,7 +24,6 @@ from schemas.income import (
     IncomeUpdate,
     IncomePatch,
     IncomeResponse,
-    IncomeActionResponse,
     IncomePaginatedResponse
 )
 

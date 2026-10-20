@@ -70,7 +70,6 @@ class ExpenseService:
             raise
 
     def get_expenses(self, income_id: int) -> dict:
-        income = self.get_income(income_id)
         expenses = self.expense_repository.get_by_income_id(income_id)
         return expenses
 

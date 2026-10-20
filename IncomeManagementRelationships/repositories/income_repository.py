@@ -11,7 +11,7 @@ class IncomeRepository:
         statement = select(Income)
         if income_name:
             statement = statement.where(Income.source.ilike(f"{income_name.strip()}%"))
-        count_statement = select(func.count()).select_from(statement.order_by(None).subquery())
+        count_statement = select(func.count()).select_from(statement.subquery())
 
         total = self.db.scalar(count_statement) or 0
         offset = (page - 1) * page_size
