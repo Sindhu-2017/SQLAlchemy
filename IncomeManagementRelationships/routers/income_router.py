@@ -6,10 +6,9 @@ from fastapi import (
     Path,
     Query,
     status,
-    File, 
-    UploadFile,
     Body
 )
+from decimal import Decimal
 from sqlalchemy.orm import Session
 from dependencies.database import get_db
 from services.income_service import IncomeService
@@ -140,3 +139,11 @@ def delete_income(
 @router.get("/reports/inner-join")
 def get_income_expenses_inner_join(service: IncomeServiceDependency):
     return service.get_income_expenses_inner_join()
+
+
+@router.get("/reports/summary")
+def get_income_summary(
+    service: IncomeServiceDependency,
+    min_expense: Annotated[Decimal | None,Query(ge=0)] = None
+):
+    return service.get_income_summary(min_expense)

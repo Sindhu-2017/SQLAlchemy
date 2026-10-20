@@ -1,5 +1,5 @@
 from sqlalchemy import select, func
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session, joinedload
 
 from models.income_expense import Income, Expense
 
@@ -10,17 +10,11 @@ class ExpenseRepository:
     def get_by_id(self, expense_id: int) -> Expense | None:
         return self.db.get(Expense, expense_id)
 
-    def get_by_id_with_income(self,expense_id: int) -> Expense | None:
-        statement = (
-            select(Expense)
-            .options(selectinload(Expense.income))
-            .where(Expense.expense_id == expense_id)
-        )
-        return self.db.scalars(statement).first()
 
     def get_by_income_id(self,income_id: int) -> list[Expense]:
         statement = (
             select(Expense)
+            .options(joinedload(Expense.income))
             .where(Expense.income_id == income_id)
             .order_by(Expense.expense_id)
         )

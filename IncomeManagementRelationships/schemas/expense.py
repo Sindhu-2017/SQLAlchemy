@@ -15,6 +15,12 @@ class ExpensePatch(BaseModel):
     description: str | None = None
 
 
+class IncomeBasicResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    income_id: int
+    source: str
+
+
 class ExpenseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     expense_id: int
@@ -22,3 +28,5 @@ class ExpenseResponse(BaseModel):
     expense_name: str
     amount: Decimal
     description: str | None = None
+    income: IncomeBasicResponse | None = None
+    

@@ -1,6 +1,7 @@
 from sqlalchemy import select,func
 from sqlalchemy.orm import Session,selectinload
-from models.income_expense import Income
+from models.income_expense import Income,Expense
+from decimal import Decimal
 
 class IncomeRepository:
     def __init__(self,db:Session):
@@ -18,9 +19,6 @@ class IncomeRepository:
         statement = (statement.order_by(Income.income_id).offset(offset).limit(page_size))
         records = list(self.db.scalars(statement).all())
         return records, total
-
-    def get_by_id(self, income_id: int) -> Income | None:
-        return self.db.get(Income, income_id)
 
     def create(self, income: Income) -> Income:
         self.db.add(income)
@@ -44,3 +42,50 @@ class IncomeRepository:
             .where(Income.income_id == income_id)
         )
         return self.db.scalars(statement).first()
+
+
+    def get_income_summary(self,min_expense: Decimal | None = None) -> list[dict]:
+        expense_summary = (
+            select(
+                Expense.income_id.label("income_id"),
+                func.sum(Expense.amount).label("total_expenses")
+            )
+            .group_by(Expense.income_id)
+            .subquery()
+        )
+
+        total_expenses = func.coalesce(expense_summary.c.total_expenses, 0)
+
+        statement = (
+            select(
+                Income.income_type.label("income_type"),
+                func.count(Income.income_id).label("total_records"),
+                func.sum(Income.amount).label("total_income"),
+                func.sum(Income.tax_amount).label("total_tax"),
+                func.sum(total_expenses).label("total_expenses"),
+                func.sum(Income.net_income).label("total_net_income"),
+                func.sum(Income.net_income - total_expenses).label("remaining_balance")
+            )
+            .outerjoin(expense_summary,Income.income_id == expense_summary.c.income_id)
+            .group_by(Income.income_type)
+        )
+        if min_expense is not None:
+            statement = statement.having(
+                func.sum(total_expenses) > min_expense
+            )
+
+        statement = statement.order_by(Income.income_type)
+        rows = self.db.execute(statement).all()
+
+        return [
+            {
+                "income_type": row.income_type,
+                "total_records": row.total_records,
+                "total_income": row.total_income,
+                "total_tax": row.total_tax,
+                "total_expenses": row.total_expenses,
+                "total_net_income": row.total_net_income,
+                "remaining_balance": row.remaining_balance
+            }
+            for row in rows
+        ]

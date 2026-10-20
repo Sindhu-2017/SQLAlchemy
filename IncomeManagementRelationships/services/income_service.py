@@ -171,4 +171,8 @@ class IncomeService:
 
         return list(incomes.values())
 
+
+    def get_income_summary(self,min_expense: Decimal | None = None) -> list[dict]:
+        return self.repository.get_income_summary(min_expense)
+
     

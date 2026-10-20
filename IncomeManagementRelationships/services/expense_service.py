@@ -72,12 +72,7 @@ class ExpenseService:
     def get_expenses(self, income_id: int) -> dict:
         income = self.get_income(income_id)
         expenses = self.expense_repository.get_by_income_id(income_id)
-        return {
-            "income_id": income.income_id,
-            "expense_amount": income.expense_amount,
-            "cash_in_hand": income.cash_in_hand,
-            "expenses": expenses,
-        }
+        return expenses
 
     def patch_expense(self,expense_id: int,data: ExpensePatch) -> dict:
         expense = self.get_expense(expense_id)

@@ -5,7 +5,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from dependencies.database import get_db
 from services.expense_service import ExpenseService
-from schemas.expense import ExpenseCreate, ExpensePatch
+from schemas.expense import ExpenseCreate, ExpensePatch,ExpenseResponse
 from exceptions.income_exceptions import (
     IncomeNotFoundError,
     InvalidIncomeOperationError,
@@ -33,7 +33,7 @@ def add_expense(
         raise HTTPException(status_code=422, detail=str(err))
 
 
-@router.get("/income/{income_id}")
+@router.get("/income/{income_id}",response_model=list[ExpenseResponse])
 def get_expenses(
     income_id: Annotated[int, Path(gt=0)],
     service: ExpenseServiceDependency
