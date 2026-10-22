@@ -56,7 +56,7 @@ class IncomeResponse(BaseModel):
     net_income: Decimal
     cash_in_hand: Decimal
     description: str | None = None
-    # expenses :list[ExpenseResponse]
+    expenses :list[ExpenseResponse]
 
 class IncomeActionResponse(BaseModel):
     message: str
