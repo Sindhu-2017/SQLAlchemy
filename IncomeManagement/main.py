@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from routers.income_router import router as income_router
-
 app = FastAPI(
     title="Income Management API",
     description=(
