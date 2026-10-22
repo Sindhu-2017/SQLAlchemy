@@ -54,7 +54,8 @@ class Income(Base):
     )
 
     expenses : Mapped[list["Expense"]] = relationship(
-        back_populates="income"
+        back_populates="income",
+        cascade="all,delete-orphan"
     )
 
 
