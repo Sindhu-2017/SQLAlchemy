@@ -22,16 +22,21 @@ class ExpenseService:
         self.income_repository = income_repository
         self.expense_repository = expense_repository
 
+
     async def get_income(self, income_id: int) -> Income:
         income =await self.income_repository.get_by_id(income_id)
+
         if income is None:
             raise IncomeNotFoundError(income_id)
         return income
 
     async def get_expense(self, expense_id: int) -> Expense:
         expense =await self.expense_repository.get_by_id(expense_id)
+
         if expense is None:
-            raise InvalidIncomeOperationError(f"Expense with ID {expense_id} was not found.")
+            raise InvalidIncomeOperationError(
+                f"Expense with ID {expense_id} was not found."
+            )
         return expense
 
     async def recalculate_income(self, income: Income) -> None:
@@ -86,8 +91,10 @@ class ExpenseService:
         expense =await self.get_expense(expense_id)
         income =await self.get_income(expense.income_id)
         changes = data.model_dump(exclude_unset=True)
+        
         if not changes:
             raise InvalidIncomeOperationError("Provide at least one field to update.")
+        
         if any(
             value is None and field != "description"
             for field, value in changes.items()

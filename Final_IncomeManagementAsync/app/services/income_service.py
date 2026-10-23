@@ -55,7 +55,10 @@ class IncomeService:
             raise IncomeNotFoundError(income_id)
         return income
 
-    async def calculate_income(self,amount: Decimal,tax_percentage: Decimal,expense_amount: Decimal) -> tuple[Decimal, Decimal, Decimal]:
+    async def calculate_income(
+            self,amount: Decimal,tax_percentage: Decimal,expense_amount: Decimal
+    ) -> tuple[Decimal, Decimal, Decimal]:
+        
         tax_amount = amount * tax_percentage / 100
         net_income = amount - tax_amount
         cash_in_hand = net_income - expense_amount
