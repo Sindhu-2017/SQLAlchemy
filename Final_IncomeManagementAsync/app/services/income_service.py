@@ -26,6 +26,7 @@ class IncomeService:
         self.expense_repository = expense_repository
         self.db=db
 
+    # get all incomes
     async def get_incomes(self,page: int,page_size: int,income_name: str | None = None) -> dict:
         records, total = await self.repository.get_all(
             page=page,
@@ -49,12 +50,14 @@ class IncomeService:
         }
 
 
+    # get income based on income_id
     async def get_income(self, income_id: int) -> Income:
         income =await self.repository.get_by_id(income_id)
         if income is None:
             raise IncomeNotFoundError(income_id)
         return income
 
+    # calculates tax,net_income,cash in hand
     async def calculate_income(
             self,amount: Decimal,tax_percentage: Decimal,expense_amount: Decimal
     ) -> tuple[Decimal, Decimal, Decimal]:
@@ -67,6 +70,7 @@ class IncomeService:
             raise InvalidIncomeOperationError("Expenses cannot exceed net income." )
         return tax_amount, net_income, cash_in_hand
 
+    # create income
     async def create_income(self, data: IncomeCreate) -> Income:
         tax_amount, net_income, cash_in_hand = (
             await self.calculate_income(data.amount,data.tax_percentage,data.expense_amount)
@@ -94,6 +98,8 @@ class IncomeService:
             await self.db.rollback()
             raise
 
+
+    # update income
     async def update_income(self,income_id: int,data: IncomeUpdate) -> Income:
         income = await self.get_income(income_id)
         tax_amount, net_income, cash_in_hand = (
@@ -115,6 +121,8 @@ class IncomeService:
             await self.db.rollback()
             raise
 
+
+    # patch income
     async def patch_income(self,income_id: int, data: IncomePatch) -> Income:
         income = await self.get_income(income_id)
         changes = data.model_dump(exclude_unset=True)
@@ -147,6 +155,8 @@ class IncomeService:
             await self.db.rollback()
             raise
 
+
+    # delete income
     async def delete_income(self, income_id: int) -> dict:
         income =await self.get_income(income_id)
         try:
@@ -159,6 +169,8 @@ class IncomeService:
             await self.db.rollback()
             raise
 
+
+    # inner join
     async def get_income_expenses_inner_join(self) -> list[dict]:
         rows =await self.expense_repository.get_income_expenses_inner_join()
         incomes = {}
@@ -182,6 +194,7 @@ class IncomeService:
         return list(incomes.values())
 
 
+    # income summary
     async def get_income_summary(self,min_expense: Decimal | None = None) -> list[dict]:
         return await self.repository.get_income_summary(min_expense)
 

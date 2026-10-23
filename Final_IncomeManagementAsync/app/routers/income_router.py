@@ -42,6 +42,8 @@ router = APIRouter(
 
 IncomeServiceDependency = Annotated[IncomeService,Depends(get_income_service)]
 
+
+# get all incomes
 @router.get("/",response_model=IncomePaginatedResponse)
 async def get_all_income(
     service: IncomeServiceDependency,
@@ -52,6 +54,7 @@ async def get_all_income(
     return await service.get_incomes(page=page,page_size=page_size,income_name=income_name)
 
 
+# get by income id
 @router.get("/{income_id}",response_model=IncomeByIDResponse)
 async def get_one_income(
     income_id: Annotated[int, Path(gt=0)],
@@ -66,7 +69,12 @@ async def get_one_income(
         ) 
 
 
-@router.post("/",response_model=IncomeResponse,status_code=status.HTTP_201_CREATED)
+# create income
+@router.post(
+    "/",
+    response_model=IncomeResponse,
+    status_code=status.HTTP_201_CREATED
+)
 async def create_income(
     data: IncomeCreate,
     service: IncomeServiceDependency
@@ -80,6 +88,7 @@ async def create_income(
             detail=str(err)
         )
 
+# update income
 @router.put("/{income_id}",response_model=IncomeResponse)
 async def update_income(
     income_id: Annotated[int, Path(gt=0)],
@@ -100,6 +109,8 @@ async def update_income(
             detail=str(err)
         )
 
+
+# patch income
 @router.patch("/{income_id}",response_model=IncomeResponse)
 async def patch_income(
     income_id: Annotated[int, Path(gt=0)],
@@ -121,6 +132,7 @@ async def patch_income(
         )
 
 
+# delete income
 @router.delete("/{income_id}")
 async def delete_income(
     income_id: Annotated[int, Path(gt=0)],
@@ -134,11 +146,13 @@ async def delete_income(
             detail=str(err)
         ) 
 
+# inner join
 @router.get("/reports/inner-join")
 async def get_income_expenses_inner_join(service: IncomeServiceDependency):
     return await service.get_income_expenses_inner_join()
 
 
+# summary
 @router.get("/reports/summary")
 async def get_income_summary(
     service: IncomeServiceDependency,

@@ -9,6 +9,7 @@ class IncomeRepository(IncomeRepositoryInterface):
     def __init__(self,db:AsyncSession):
         self.db=db
 
+    # get all incomes
     async def get_all(self,page: int,page_size: int, income_name: str | None = None) -> tuple[list[Income], int]:
         statement = select(Income)
         if income_name:
@@ -30,21 +31,25 @@ class IncomeRepository(IncomeRepositoryInterface):
         records = list(result.all())
         return records, total
 
+    # post-income data
     async def create(self, income: Income) -> Income:
         self.db.add(income)
         await self.db.flush()
         await self.db.refresh(income)
         return income
 
+    # update income
     async def update(self, income: Income) -> Income:
         await self.db.flush()
         await self.db.refresh(income)
         return income
 
+    # delete income
     async def delete(self, income: Income) -> None:
         await self.db.delete(income)
         await self.db.flush()
 
+    # get by income id
     async def get_by_id(self, income_id: int) -> Income | None:
         statement = (
             select(Income)
@@ -55,6 +60,7 @@ class IncomeRepository(IncomeRepositoryInterface):
         return result.first()
 
 
+    # income summary  based on income type
     async def get_income_summary(self,min_expense: Decimal | None = None) -> list[dict]:
         expense_summary = (
             select(

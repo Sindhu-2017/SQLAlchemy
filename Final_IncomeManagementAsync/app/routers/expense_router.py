@@ -19,6 +19,7 @@ router = APIRouter(
 
 ExpenseServiceDependency = Annotated[ExpenseService,Depends(get_expense_service)]
 
+# create expense based on income id
 @router.post("/income/{income_id}",status_code=status.HTTP_201_CREATED)
 async def add_expense(
     income_id: Annotated[int, Path(gt=0)],
@@ -39,6 +40,7 @@ async def add_expense(
         )
 
 
+# get by income id
 @router.get("/income/{income_id}",response_model=list[ExpenseResponse])
 async def get_expenses(
     income_id: Annotated[int, Path(gt=0)],
@@ -54,6 +56,7 @@ async def get_expenses(
         )
 
 
+# patch income
 @router.patch("/{expense_id}")
 async def patch_expense(
     expense_id: Annotated[int, Path(gt=0)],
@@ -71,6 +74,7 @@ async def patch_expense(
         )
 
 
+# delete expense
 @router.delete("/{expense_id}")
 async def delete_expense(
     expense_id: Annotated[int, Path(gt=0)],
@@ -87,6 +91,7 @@ async def delete_expense(
         )
 
 
+# left outer join
 @router.get("/reports/left-outer-join")
 async def get_income_expenses_outer_join(service: ExpenseServiceDependency):
     

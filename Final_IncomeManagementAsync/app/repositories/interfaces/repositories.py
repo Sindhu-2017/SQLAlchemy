@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from decimal import Decimal
 from app.models.income_expense import Income, Expense
 
+# income
 class IncomeRepositoryInterface(ABC):
     @abstractmethod
     def get_all(self,page: int,page_size: int,income_name: str | None = None) -> tuple[list[Income], int]:
@@ -27,7 +28,7 @@ class IncomeRepositoryInterface(ABC):
     def get_income_summary(self,min_expense: Decimal | None = None) -> list[dict]:
         pass
 
-
+# expense
 class ExpenseRepositoryInterface(ABC):
     @abstractmethod
     def get_by_id(self, expense_id: int) -> Expense | None:

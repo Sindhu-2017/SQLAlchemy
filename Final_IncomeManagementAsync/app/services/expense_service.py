@@ -23,6 +23,7 @@ class ExpenseService:
         self.expense_repository = expense_repository
 
 
+    # get income by id
     async def get_income(self, income_id: int) -> Income:
         income =await self.income_repository.get_by_id(income_id)
 
@@ -30,6 +31,8 @@ class ExpenseService:
             raise IncomeNotFoundError(income_id)
         return income
 
+
+    # get expense by id
     async def get_expense(self, expense_id: int) -> Expense:
         expense =await self.expense_repository.get_by_id(expense_id)
 
@@ -39,6 +42,8 @@ class ExpenseService:
             )
         return expense
 
+
+    # recalculating net_income and cash in hand when adding or updating expense
     async def recalculate_income(self, income: Income) -> None:
         total =await self.expense_repository.get_total_by_income_id(
             income.income_id
@@ -53,6 +58,8 @@ class ExpenseService:
         income.net_income = net_income
         income.cash_in_hand = cash_in_hand
 
+
+    # create expense
     async def add_expense(self,income_id: int,data: ExpenseCreate) -> dict:
         income =await self.get_income(income_id)
         expense = Expense(
@@ -83,15 +90,18 @@ class ExpenseService:
             await self.db.rollback()
             raise
 
+
+    # get all expenses based on income id
     async def get_expenses(self, income_id: int) -> dict:
         expenses =await self.expense_repository.get_by_income_id(income_id)
         return expenses
 
+    # patch expense
     async def patch_expense(self,expense_id: int,data: ExpensePatch) -> dict:
         expense =await self.get_expense(expense_id)
         income =await self.get_income(expense.income_id)
         changes = data.model_dump(exclude_unset=True)
-        
+
         if not changes:
             raise InvalidIncomeOperationError("Provide at least one field to update.")
         
@@ -121,6 +131,7 @@ class ExpenseService:
             await self.db.rollback()
             raise
 
+    # delete expense
     async def delete_expense(self, expense_id: int) -> dict:
         expense =await self.get_expense(expense_id)
         income =await self.get_income(expense.income_id)
@@ -141,6 +152,8 @@ class ExpenseService:
             await self.db.rollback()
             raise
 
+
+    # outer join
     async def get_income_expenses_outer_join(self) -> list[dict]:
         rows =await self.expense_repository.get_income_expenses_outer_join()
         incomes = {}

@@ -8,10 +8,12 @@ class ExpenseRepository(ExpenseRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    # get by expense id
     async def get_by_id(self, expense_id: int) -> Expense | None:
         return await self.db.get(Expense, expense_id)
 
 
+    # get by income id
     async def get_by_income_id(self,income_id: int) -> list[Expense]:
         statement = (
             select(Expense)
@@ -59,11 +61,14 @@ class ExpenseRepository(ExpenseRepositoryInterface):
         expense.expense_id = row[0]
         return expense
 
+    # update expense
     async def update(self, expense: Expense) -> Expense:
         await self.db.flush()
         await self.db.refresh(expense)
         return expense
 
+
+    # delete expense
     async def delete(self, expense: Expense) -> None:
         await self.db.delete(expense)
         await self.db.flush()
