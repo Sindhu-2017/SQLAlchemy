@@ -18,7 +18,7 @@ def get_income_service(db: Session = Depends(get_db)) -> IncomeService:
     )
 
 
-# dependency function expense service
+# dependency function for expense service
 def get_expense_service(db: Session = Depends(get_db)) -> ExpenseService:
     return ExpenseService(
         db=db,
