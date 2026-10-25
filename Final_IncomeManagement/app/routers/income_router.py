@@ -33,6 +33,7 @@ from app.exceptions.income_exceptions import(
 )
 
 from app.dependencies.service_dependecies import get_income_service
+from app.dependencies.auth import require_permissions
 
 router = APIRouter(
     prefix = "/api/income",
@@ -44,7 +45,11 @@ IncomeServiceDependency = Annotated[IncomeService,Depends(get_income_service)]
 
 
 # get all incomes
-@router.get("/",response_model=IncomePaginatedResponse)
+@router.get(
+    "/",
+    response_model=IncomePaginatedResponse,
+    dependencies=[Depends(require_permissions("income:read"))]
+)
 async def get_all_income(
     service: IncomeServiceDependency,
     page: Annotated[int, Query(ge=1)] = 1,
@@ -55,7 +60,11 @@ async def get_all_income(
 
 
 # get by income id
-@router.get("/{income_id}",response_model=IncomeByIDResponse)
+@router.get(
+    "/{income_id}",
+    response_model=IncomeByIDResponse,
+    dependencies=[Depends(require_permissions("income:read"))]
+)
 async def get_one_income(
     income_id: Annotated[int, Path(gt=0)],
     service: IncomeServiceDependency
@@ -73,7 +82,8 @@ async def get_one_income(
 @router.post(
     "/",
     response_model=IncomeResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permissions("income:create"))]
 )
 async def create_income(
     data: IncomeCreate,
@@ -89,7 +99,11 @@ async def create_income(
         )
 
 # update income
-@router.put("/{income_id}",response_model=IncomeResponse)
+@router.put(
+    "/{income_id}",
+    response_model=IncomeResponse,
+    dependencies=[Depends(require_permissions("income:update"))]
+)
 async def update_income(
     income_id: Annotated[int, Path(gt=0)],
     data: IncomeUpdate,
@@ -111,7 +125,11 @@ async def update_income(
 
 
 # patch income
-@router.patch("/{income_id}",response_model=IncomeResponse)
+@router.patch(
+    "/{income_id}",
+    response_model=IncomeResponse,
+    dependencies=[Depends(require_permissions("income:update"))]
+)
 async def patch_income(
     income_id: Annotated[int, Path(gt=0)],
     data: IncomePatch,
@@ -133,7 +151,10 @@ async def patch_income(
 
 
 # delete income
-@router.delete("/{income_id}")
+@router.delete(
+    "/{income_id}",
+    dependencies=[Depends(require_permissions("income:delete"))]
+)
 async def delete_income(
     income_id: Annotated[int, Path(gt=0)],
     service: IncomeServiceDependency
@@ -147,13 +168,19 @@ async def delete_income(
         ) 
 
 # inner join
-@router.get("/reports/inner-join")
+@router.get(
+    "/reports/inner-join",
+    dependencies=[Depends(require_permissions("income:read"))]
+)
 async def get_income_expenses_inner_join(service: IncomeServiceDependency):
     return await service.get_income_expenses_inner_join()
 
 
 # summary
-@router.get("/reports/summary")
+@router.get(
+    "/reports/summary",
+    dependencies=[Depends(require_permissions("income:read"))]
+)
 async def get_income_summary(
     service: IncomeServiceDependency,
     min_expense: Annotated[Decimal | None,Query(ge=0)] = None

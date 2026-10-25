@@ -2,15 +2,12 @@ import hashlib
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
-
 import jwt
 from pwdlib import PasswordHash
 
 from app.config.settings import get_settings
 
-
 settings = get_settings()
-
 password_hash = PasswordHash.recommended()
 
 DUMMY_PASSWORD_HASH = password_hash.hash(
@@ -38,11 +35,10 @@ def create_token(
     token_type: str,
     expires_delta: timedelta,
 ) -> tuple[str, str, datetime]:
-   
+       
     now = datetime.now(timezone.utc)
     expires_at = now + expires_delta
     jti = str(uuid.uuid4())
-
     payload: dict[str, Any] = {
         "sub": str(user_id),
         "role": role,
@@ -51,13 +47,11 @@ def create_token(
         "iat": now,
         "exp": expires_at,
     }
-
     token = jwt.encode(
         payload,
-        settings.jwt_secret_key.get_secret_value(),
-        algorithm=settings.jwt_algorithm,
+        settings.JWT_SECRET_KEY.get_secret_value(),
+        algorithm=settings.JWT_ALGORITHM
     )
-
     return token, jti, expires_at
 
 
@@ -71,10 +65,9 @@ def create_access_token(
         role=role,
         token_type="access",
         expires_delta=timedelta(
-            minutes=settings.access_token_expire_minutes
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         ),
     )
-
     return token
 
 
@@ -88,7 +81,7 @@ def create_refresh_token(
         role=role,
         token_type="refresh",
         expires_delta=timedelta(
-            days=settings.refresh_token_expire_days
+            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
         ),
     )
 
@@ -96,8 +89,8 @@ def create_refresh_token(
 def decode_token(token: str) -> dict[str, Any]:
     return jwt.decode(
         token,
-        settings.jwt_secret_key.get_secret_value(),
-        algorithms=[settings.jwt_algorithm],
+        settings.JWT_SECRET_KEY.get_secret_value(),
+        algorithms=[settings.JWT_ALGORITHM],
         options={
             "require": [
                 "sub",

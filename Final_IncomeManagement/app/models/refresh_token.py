@@ -9,9 +9,7 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
-
 from app.database.base import Base
-
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
@@ -20,7 +18,7 @@ class RefreshToken(Base):
         Integer,
         primary_key=True,
     )
-
+    # unique identifier generated for each token
     jti: Mapped[str] = mapped_column(
         String(36),
         unique=True,

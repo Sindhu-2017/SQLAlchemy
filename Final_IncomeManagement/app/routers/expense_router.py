@@ -10,6 +10,7 @@ from app.exceptions.income_exceptions import (
     InvalidIncomeOperationError,
 )
 from app.dependencies.service_dependecies import get_expense_service
+from app.dependencies.auth import require_permissions
 
 router = APIRouter(
     prefix="/api/expenses",
@@ -20,7 +21,11 @@ router = APIRouter(
 ExpenseServiceDependency = Annotated[ExpenseService,Depends(get_expense_service)]
 
 # create expense based on income id
-@router.post("/income/{income_id}",status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/income/{income_id}",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permissions("expense:create"))]
+)
 async def add_expense(
     income_id: Annotated[int, Path(gt=0)],
     data: ExpenseCreate,
@@ -41,7 +46,11 @@ async def add_expense(
 
 
 # get by income id
-@router.get("/income/{income_id}",response_model=list[ExpenseResponse])
+@router.get(
+    "/income/{income_id}",
+    response_model=list[ExpenseResponse],
+    dependencies=[Depends(require_permissions("expense:read"))]
+)
 async def get_expenses(
     income_id: Annotated[int, Path(gt=0)],
     service: ExpenseServiceDependency
@@ -57,7 +66,10 @@ async def get_expenses(
 
 
 # patch income
-@router.patch("/{expense_id}")
+@router.patch(
+    "/{expense_id}",
+    dependencies=[Depends(require_permissions("expense:update"))]
+)
 async def patch_expense(
     expense_id: Annotated[int, Path(gt=0)],
     data: ExpensePatch,
@@ -75,7 +87,10 @@ async def patch_expense(
 
 
 # delete expense
-@router.delete("/{expense_id}")
+@router.delete(
+    "/{expense_id}",
+    dependencies=[Depends(require_permissions("expense:delete"))]
+)
 async def delete_expense(
     expense_id: Annotated[int, Path(gt=0)],
     service: ExpenseServiceDependency
@@ -92,7 +107,10 @@ async def delete_expense(
 
 
 # left outer join
-@router.get("/reports/left-outer-join")
+@router.get(
+    "/reports/left-outer-join",
+    dependencies=[Depends(require_permissions("expense:read"))]
+)
 async def get_income_expenses_outer_join(service: ExpenseServiceDependency):
     
     return await service.get_income_expenses_outer_join()

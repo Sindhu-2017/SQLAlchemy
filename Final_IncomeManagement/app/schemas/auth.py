@@ -11,7 +11,7 @@ class RegisterRequest(BaseModel):
     username: str = Field(
         min_length=3,
         max_length=50,
-        pattern=r"^[A-Za-z0-9_.-]+$",
+        pattern=r"^[A-Za-z0-9_.-]+$"
     )
 
     email: EmailStr

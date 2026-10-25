@@ -9,6 +9,8 @@ from alembic import context
 
 from app.database.base import Base
 from app.models.income_expense import Income,Expense
+from app.models.user import User
+from app.models.refresh_token import RefreshToken
 
 from app.config.settings import get_settings
 
