@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.database.connection import SessionLocal
 from app.models.user import User
-from app.security import hash_password
+from app.core.security import hash_password
 
 async def main() -> None:
     username = input("Admin username: ").strip()

@@ -1,12 +1,15 @@
+from typing import Annotated
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies.database import get_db
+from app.core.security import decode_token
+from app.dependencies.service_dependecies import get_auth_service
 from app.models.user import User
-from app.services.auth_service import AuthService
-from app.security import decode_token
+from app.services.auth_service import (
+    AuthService,
+    AuthenticationError,
+)
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -14,26 +17,26 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db),
+    token: Annotated[str, Depends(oauth2_scheme)],
+    service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> User:
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials.",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
     try:
         payload = decode_token(token)
         if payload.get("type") != "access":
             raise credentials_error
-        
-        user = await AuthService(db).get_user_from_token(payload)
-        return user
+        return await service.get_user_from_token(payload)
 
     except HTTPException:
         raise
     except (
         jwt.InvalidTokenError,
+        AuthenticationError,
         ValueError,
         TypeError,
         KeyError,
@@ -43,14 +46,13 @@ async def get_current_user(
 
 def require_roles(*allowed_roles: str):
     async def role_checker(
-        current_user: User = Depends(get_current_user)
+        current_user: Annotated[User, Depends(get_current_user)],
     ) -> User:
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to perform this action.",
             )
-
         return current_user
 
     return role_checker
@@ -66,21 +68,18 @@ def require_permissions(*required_permissions: str):
             "expense:read",
             "expense:create",
             "expense:update",
-            "expense:delete"
+            "expense:delete",
         },
         "user": {
             "income:read",
-            "expense:read"
+            "expense:read",
         },
     }
 
     async def permission_checker(
-        current_user: User = Depends(get_current_user),
+        current_user: Annotated[User, Depends(get_current_user)],
     ) -> User:
-        permissions = role_permissions.get(
-            current_user.role,
-            set(),
-        )
+        permissions = role_permissions.get(current_user.role, set())
 
         if not set(required_permissions).issubset(permissions):
             raise HTTPException(

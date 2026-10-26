@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from fastapi import (
     APIRouter,
     Depends,
@@ -7,12 +8,9 @@ from fastapi import (
     status,
 )
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies.auth import (
-    get_current_user,
-)
-from app.dependencies.database import get_db
+from app.dependencies.auth import get_current_user
+from app.dependencies.service_dependecies import get_auth_service
 from app.models.user import User
 from app.schemas.auth import (
     LogoutRequest,
@@ -22,29 +20,35 @@ from app.schemas.auth import (
     TokenResponse,
     UserResponse,
 )
-from app.security import decode_token
 from app.services.auth_service import (
     AuthService,
     AuthenticationError,
     RegistrationConflict,
 )
 
+
 router = APIRouter(
     prefix="/api/auth",
     tags=["Authentication"],
 )
 
+AuthServiceDependency = Annotated[
+    AuthService,
+    Depends(get_auth_service),
+]
+
+
 @router.post(
     "/register",
     response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
 )
 async def register(
     data: RegisterRequest,
-    db: Annotated[AsyncSession, Depends(get_db)]
+    service: AuthServiceDependency,
 ) -> User:
     try:
-        return await AuthService(db).register(data)
+        return await service.register(data)
 
     except RegistrationConflict as exc:
         raise HTTPException(
@@ -55,45 +59,45 @@ async def register(
 
 @router.post(
     "/login",
-    response_model=TokenResponse
+    response_model=TokenResponse,
 )
 async def login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> TokenResponse:
+    form_data: Annotated[
+        OAuth2PasswordRequestForm,
+        Depends(),
+    ],
+    service: AuthServiceDependency,
+) -> dict[str, str]:
     try:
-        tokens = await AuthService(db).login(
+        return await service.login(
             username=form_data.username,
             password=form_data.password,
         )
-        return TokenResponse(**tokens)
 
     except AuthenticationError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password.",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
 
 @router.post(
     "/refresh",
-    response_model=TokenResponse
+    response_model=TokenResponse,
 )
 async def refresh_token(
     data: RefreshRequest,
-    db: Annotated[AsyncSession, Depends(get_db)],
-) -> TokenResponse:
+    service: AuthServiceDependency,
+) -> dict[str, str]:
     try:
-        tokens = await AuthService(db).refresh(
-            data.refresh_token
-        )
-        return TokenResponse(**tokens)
+        return await service.refresh(data.refresh_token)
 
     except AuthenticationError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token.",
+            headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
 
@@ -103,41 +107,53 @@ async def refresh_token(
 )
 async def logout(
     data: LogoutRequest,
-    current_user: Annotated[User,Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)]
+    current_user: Annotated[
+        User,
+        Depends(get_current_user),
+    ],
+    service: AuthServiceDependency,
 ) -> Response:
-
     try:
-        await AuthService(db).logout(
+        await service.logout(
             raw_refresh_token=data.refresh_token,
-            user_id=current_user.user_id,
+            current_user_id=current_user.user_id,
         )
+
     except AuthenticationError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token.",
+            headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 
 @router.get(
     "/me",
     response_model=UserResponse,
 )
 async def get_me(
-    current_user: Annotated[User,Depends(get_current_user)]
+    current_user: Annotated[
+        User,
+        Depends(get_current_user),
+    ],
 ) -> User:
     return current_user
 
 
 @router.get(
     "/token-info",
-    response_model=TokenInfoResponse
+    response_model=TokenInfoResponse,
 )
 async def get_token_info(
-    current_user: Annotated[User,Depends(get_current_user)]
+    current_user: Annotated[
+        User,
+        Depends(get_current_user),
+    ],
 ) -> TokenInfoResponse:
     return TokenInfoResponse(
         user_id=current_user.user_id,
         role=current_user.role,
-        token_type="access"
+        token_type="access",
     )
