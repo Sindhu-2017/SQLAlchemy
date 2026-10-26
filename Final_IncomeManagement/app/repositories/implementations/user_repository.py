@@ -49,7 +49,6 @@ class UserRepository(UserRepositoryInterface):
         result = await self.db.execute(
             select(User).where(or_(*conditions))
         )
-
         return result.scalars().first()
 
     async def create(

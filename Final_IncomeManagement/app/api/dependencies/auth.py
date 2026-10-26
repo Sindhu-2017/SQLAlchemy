@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from app.core.security import decode_token
-from app.dependencies.service_dependecies import get_auth_service
+from app.api.dependencies.service_dependecies import get_auth_service
 from app.models.user import User
 from app.services.auth_service import (
     AuthService,
@@ -73,7 +73,7 @@ def require_permissions(*required_permissions: str):
         "user": {
             "income:read",
             "expense:read",
-        },
+        }
     }
 
     async def permission_checker(

@@ -10,10 +10,6 @@ from app.config.settings import get_settings
 settings = get_settings()
 password_hash = PasswordHash.recommended()
 
-DUMMY_PASSWORD_HASH = password_hash.hash(
-    "DummyPasswordForTimingOnly@123"
-)
-
 
 def hash_password(password: str) -> str:
     return password_hash.hash(password)
@@ -66,7 +62,7 @@ def create_access_token(
         token_type="access",
         expires_delta=timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        ),
+        )
     )
     return token
 

@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from app.routers.income_router import router as income_router
-from app.routers.expense_router import router as expense_router
-from app.routers.auth_router import router as auth_router
+from app.api.routers.income_router import router as income_router
+from app.api.routers.expense_router import router as expense_router
+from app.api.routers.auth_router import router as auth_router
 
 
 app = FastAPI(

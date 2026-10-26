@@ -4,7 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import (
-    DUMMY_PASSWORD_HASH,
     create_access_token,
     create_refresh_token,
     decode_token,
@@ -24,12 +23,11 @@ from app.schemas.auth import RegisterRequest
 
 
 class AuthenticationError(Exception):
-    """Raised when authentication or token validation fails."""
+    pass
 
 
 class RegistrationConflict(Exception):
-    """Raised when a username or email is already registered."""
-
+    pass
 
 class AuthService:
     def __init__(
@@ -87,7 +85,6 @@ class AuthService:
         )
 
         if user is None:
-            verify_password(password, DUMMY_PASSWORD_HASH)
             raise AuthenticationError(
                 "Invalid username or password."
             )
@@ -110,11 +107,11 @@ class AuthService:
 
         access_token = create_access_token(
             user_id=user_id,
-            role=role,
+            role=role
         )
         refresh_token, jti, expires_at = create_refresh_token(
             user_id=user_id,
-            role=role,
+            role=role
         )
 
         token_record = RefreshToken(
@@ -126,7 +123,6 @@ class AuthService:
         )
 
         await self.refresh_tokens.create(token_record)
-
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
@@ -203,7 +199,6 @@ class AuthService:
                 user_id=user.user_id,
                 role=user.role,
             )
-
             await self.db.commit()
             return tokens
 

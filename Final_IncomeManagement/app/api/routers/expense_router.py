@@ -9,8 +9,8 @@ from app.exceptions.income_exceptions import (
     IncomeNotFoundError,
     InvalidIncomeOperationError,
 )
-from app.dependencies.service_dependecies import get_expense_service
-from app.dependencies.auth import require_permissions
+from app.api.dependencies.service_dependecies import get_expense_service
+from app.api.dependencies.auth import require_permissions
 
 router = APIRouter(
     prefix="/api/expenses",

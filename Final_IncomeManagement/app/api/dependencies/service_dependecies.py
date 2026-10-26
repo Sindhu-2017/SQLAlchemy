@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies.database import get_db
+from app.api.dependencies.database import get_db
 from app.repositories.implementations.expense_repository import (
     ExpenseRepository,
 )
