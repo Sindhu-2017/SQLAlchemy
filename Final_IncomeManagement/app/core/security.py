@@ -4,25 +4,19 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 import jwt
 from pwdlib import PasswordHash
-
 from app.config.settings import get_settings
 
 settings = get_settings()
 password_hash = PasswordHash.recommended()
 
-
 def hash_password(password: str) -> str:
     return password_hash.hash(password)
-
 
 def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
-    return password_hash.verify(
-        plain_password,
-        hashed_password,
-    )
+    return password_hash.verify( plain_password, hashed_password )
 
 
 def create_token(
@@ -97,7 +91,6 @@ def decode_token(token: str) -> dict[str, Any]:
             ],
         },
     )
-
 
 def hash_refresh_token(token: str) -> str:
     return hashlib.sha256(
