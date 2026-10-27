@@ -9,3 +9,8 @@ PyJWT
 pwdlib[argon2]
 python-multipart
 pydantic[email]
+pytest 
+pytest-asyncio 
+httpx 
+pytest-cov 
+aiosqlite
