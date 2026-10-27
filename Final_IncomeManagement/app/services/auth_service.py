@@ -9,7 +9,7 @@ from app.core.security import (
     decode_token,
     hash_password,
     hash_refresh_token,
-    verify_password,
+    verify_password
 )
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
@@ -17,7 +17,7 @@ from app.repositories.interfaces.refresh_token_repository import (
     RefreshTokenRepositoryInterface
 )
 from app.repositories.interfaces.user_repository import (
-    UserRepositoryInterface,
+    UserRepositoryInterface
 )
 from app.schemas.auth import RegisterRequest
 from app.exceptions.income_exceptions import (
