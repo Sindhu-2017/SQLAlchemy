@@ -8,7 +8,6 @@ from app.repositories.implementations.income_repository import (
     IncomeRepository
 )
 
-
 def make_income():
     return Income(
         income_date=date(2026, 10, 27),
@@ -90,7 +89,6 @@ async def test_get_all_income_pagination(db_session):
 @pytest.mark.asyncio
 async def test_filter_income_by_source(db_session):
     repository = IncomeRepository(db_session)
-
     await repository.create(make_income())
 
     second = make_income()
