@@ -5,16 +5,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.database import get_db
 from app.repositories.implementations.expense_repository import (
-    ExpenseRepository,
+    ExpenseRepository
 )
 from app.repositories.implementations.income_repository import (
-    IncomeRepository,
+    IncomeRepository
 )
-from app.repositories.implementations.refresh_token_repository import (
-    RefreshTokenRepository,
-)
+
 from app.repositories.implementations.user_repository import (
-    UserRepository,
+    UserRepository
 )
 from app.services.auth_service import AuthService
 from app.services.expense_service import ExpenseService
@@ -27,7 +25,7 @@ async def get_income_service(
     return IncomeService(
         db=db,
         repository=IncomeRepository(db),
-        expense_repository=ExpenseRepository(db),
+        expense_repository=ExpenseRepository(db)
     )
 
 
@@ -37,7 +35,7 @@ async def get_expense_service(
     return ExpenseService(
         db=db,
         income_repository=IncomeRepository(db),
-        expense_repository=ExpenseRepository(db),
+        expense_repository=ExpenseRepository(db)
     )
 
 
@@ -46,6 +44,5 @@ async def get_auth_service(
 ) -> AuthService:
     return AuthService(
         db=db,
-        user_repository=UserRepository(db),
-        refresh_token_repository=RefreshTokenRepository(db),
+        user_repository=UserRepository(db)
     )
