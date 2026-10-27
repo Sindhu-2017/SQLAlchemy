@@ -7,3 +7,12 @@ class IncomeNotFoundError(Exception):
 class InvalidIncomeOperationError(Exception):
     def __init__(self, message: str):
         super().__init__(message)
+
+class AuthenticationError(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class RegistrationConflict(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)

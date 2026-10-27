@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 
 from app.models.refresh_token import RefreshToken
 
-
-class IRefreshTokenRepository(ABC):
+class RefreshTokenRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_valid_for_update(

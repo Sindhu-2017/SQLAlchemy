@@ -6,7 +6,6 @@ from app.repositories.interfaces.user_repository import (
     UserRepositoryInterface,
 )
 
-
 class UserRepository(UserRepositoryInterface):
 
     def __init__(self, db: AsyncSession) -> None:

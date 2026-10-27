@@ -14,11 +14,9 @@ async def main() -> None:
     confirm_password = getpass("Confirm password: ")
 
     if password != confirm_password:
-        raise SystemExit("Passwords do not match.")
+        raise SystemExit("Passwords do not match")
     if not 12 <= len(password) <= 128:
-        raise SystemExit(
-            "Password must be between 12 and 128 characters."
-        )
+        raise SystemExit("Password must be between 12 and 128 characters")
     async with SessionLocal() as db:
         result = await db.execute(
             select(User).where(
@@ -29,13 +27,11 @@ async def main() -> None:
             )
         )
         if result.scalar_one_or_none() is not None:
-            raise SystemExit(
-                "Username or email is already registered."
-            )
+            raise SystemExit("Username or email is already registered")
 
         hashed_password = await asyncio.to_thread(
             hash_password,
-            password,
+            password
         )
 
         admin = User(
@@ -58,7 +54,6 @@ async def main() -> None:
             ) from exc
 
     print("Administrator created successfully.")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

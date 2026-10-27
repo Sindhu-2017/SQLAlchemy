@@ -14,27 +14,23 @@ from app.core.security import (
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.repositories.interfaces.refresh_token_repository import (
-    IRefreshTokenRepository,
+    RefreshTokenRepositoryInterface
 )
 from app.repositories.interfaces.user_repository import (
     UserRepositoryInterface,
 )
 from app.schemas.auth import RegisterRequest
-
-
-class AuthenticationError(Exception):
-    pass
-
-
-class RegistrationConflict(Exception):
-    pass
+from app.exceptions.income_exceptions import (
+    AuthenticationError,
+    RegistrationConflict
+)
 
 class AuthService:
     def __init__(
         self,
         db: AsyncSession,
         user_repository: UserRepositoryInterface,
-        refresh_token_repository: IRefreshTokenRepository,
+        refresh_token_repository: RefreshTokenRepositoryInterface
     ) -> None:
         self.db = db
         self.users = user_repository

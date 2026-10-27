@@ -32,10 +32,7 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
-AuthServiceDependency = Annotated[
-    AuthService,
-    Depends(get_auth_service),
-]
+AuthServiceDependency = Annotated[AuthService,Depends(get_auth_service)]
 
 
 @router.post(
@@ -62,10 +59,7 @@ async def register(
     response_model=TokenResponse,
 )
 async def login(
-    form_data: Annotated[
-        OAuth2PasswordRequestForm,
-        Depends(),
-    ],
+    form_data: Annotated[OAuth2PasswordRequestForm,Depends()],
     service: AuthServiceDependency,
 ) -> dict[str, str]:
     try:
@@ -107,11 +101,8 @@ async def refresh_token(
 )
 async def logout(
     data: LogoutRequest,
-    current_user: Annotated[
-        User,
-        Depends(get_current_user),
-    ],
-    service: AuthServiceDependency,
+    current_user: Annotated[User,Depends(get_current_user)],
+    service: AuthServiceDependency
 ) -> Response:
     try:
         await service.logout(
@@ -134,10 +125,7 @@ async def logout(
     response_model=UserResponse,
 )
 async def get_me(
-    current_user: Annotated[
-        User,
-        Depends(get_current_user),
-    ],
+    current_user: Annotated[User,Depends(get_current_user)]
 ) -> User:
     return current_user
 
@@ -147,10 +135,7 @@ async def get_me(
     response_model=TokenInfoResponse,
 )
 async def get_token_info(
-    current_user: Annotated[
-        User,
-        Depends(get_current_user),
-    ],
+    current_user: Annotated[User,Depends(get_current_user)]
 ) -> TokenInfoResponse:
     return TokenInfoResponse(
         user_id=current_user.user_id,

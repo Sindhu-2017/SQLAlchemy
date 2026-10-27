@@ -10,13 +10,12 @@ from app.exceptions.income_exceptions import (
     InvalidIncomeOperationError,
 )
 from app.api.dependencies.service_dependecies import get_expense_service
-from app.api.dependencies.auth import require_permissions
+from app.api.dependencies.auth import require_roles
 
 router = APIRouter(
     prefix="/api/expenses",
     tags=["Expenses"]
 )
-
 
 ExpenseServiceDependency = Annotated[ExpenseService,Depends(get_expense_service)]
 
@@ -24,7 +23,7 @@ ExpenseServiceDependency = Annotated[ExpenseService,Depends(get_expense_service)
 @router.post(
     "/income/{income_id}",
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_permissions("expense:create"))]
+    dependencies=[Depends(require_roles("admin"))]
 )
 async def add_expense(
     income_id: Annotated[int, Path(gt=0)],
@@ -49,7 +48,7 @@ async def add_expense(
 @router.get(
     "/income/{income_id}",
     response_model=list[ExpenseResponse],
-    dependencies=[Depends(require_permissions("expense:read"))]
+    dependencies=[Depends(require_roles("admin","user"))]
 )
 async def get_expenses(
     income_id: Annotated[int, Path(gt=0)],
@@ -68,7 +67,7 @@ async def get_expenses(
 # patch income
 @router.patch(
     "/{expense_id}",
-    dependencies=[Depends(require_permissions("expense:update"))]
+    dependencies=[Depends(require_roles("admin"))]
 )
 async def patch_expense(
     expense_id: Annotated[int, Path(gt=0)],
@@ -89,7 +88,7 @@ async def patch_expense(
 # delete expense
 @router.delete(
     "/{expense_id}",
-    dependencies=[Depends(require_permissions("expense:delete"))]
+    dependencies=[Depends(require_roles("admin"))]
 )
 async def delete_expense(
     expense_id: Annotated[int, Path(gt=0)],
@@ -109,7 +108,7 @@ async def delete_expense(
 # left outer join
 @router.get(
     "/reports/left-outer-join",
-    dependencies=[Depends(require_permissions("expense:read"))]
+    dependencies=[Depends(require_roles("admin","user"))]
 )
 async def get_income_expenses_outer_join(service: ExpenseServiceDependency):
     

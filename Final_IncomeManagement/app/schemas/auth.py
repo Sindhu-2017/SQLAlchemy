@@ -3,9 +3,8 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     EmailStr,
-    Field,
+    Field
 )
-
 
 class RegisterRequest(BaseModel):
     username: str = Field(

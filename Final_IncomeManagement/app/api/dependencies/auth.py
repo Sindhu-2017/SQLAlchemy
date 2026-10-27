@@ -57,36 +57,3 @@ def require_roles(*allowed_roles: str):
 
     return role_checker
 
-
-def require_permissions(*required_permissions: str):
-    role_permissions = {
-        "admin": {
-            "income:read",
-            "income:create",
-            "income:update",
-            "income:delete",
-            "expense:read",
-            "expense:create",
-            "expense:update",
-            "expense:delete",
-        },
-        "user": {
-            "income:read",
-            "expense:read",
-        }
-    }
-
-    async def permission_checker(
-        current_user: Annotated[User, Depends(get_current_user)],
-    ) -> User:
-        permissions = role_permissions.get(current_user.role, set())
-
-        if not set(required_permissions).issubset(permissions):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions.",
-            )
-
-        return current_user
-
-    return permission_checker
