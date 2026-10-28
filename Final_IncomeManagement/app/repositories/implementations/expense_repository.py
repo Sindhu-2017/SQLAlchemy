@@ -1,7 +1,8 @@
 from sqlalchemy import select, func,text
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.income_expense import Income, Expense
+from app.models.income import Income
+from app.models.expense import Expense
 from app.repositories.interfaces.repositories import ExpenseRepositoryInterface
 
 class ExpenseRepository(ExpenseRepositoryInterface):

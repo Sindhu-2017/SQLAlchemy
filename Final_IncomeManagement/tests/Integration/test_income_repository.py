@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 import pytest
-from app.models.income_expense import Income
+from app.models.income import Income
 from app.repositories.implementations.income_repository import (
     IncomeRepository
 )

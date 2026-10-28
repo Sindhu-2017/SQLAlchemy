@@ -1,6 +1,7 @@
 from decimal import Decimal
 from sqlalchemy.orm import Session
-from app.models.income_expense import Income, Expense
+from app.models.income import Income
+from app.models.expense import Expense
 
 from app.schemas.expense import ExpenseCreate, ExpensePatch
 from app.exceptions.income_exceptions import (

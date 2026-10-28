@@ -11,7 +11,8 @@ from sqlalchemy.pool import StaticPool
 from app.main import app
 from app.database.base import Base
 from app.api.dependencies.database import get_db
-from app.models.income_expense import Income, Expense
+from app.models.income import Income
+from app.models.expense import Expense
 from app.models.user import User
 
 

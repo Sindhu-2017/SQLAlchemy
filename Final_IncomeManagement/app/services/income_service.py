@@ -5,7 +5,7 @@ from app.exceptions.income_exceptions import (
     IncomeNotFoundError,
     InvalidIncomeOperationError
 )
-from app.models.income_expense import Income
+from app.models.income import Income
 from app.schemas.income import (
     IncomeCreate,
     IncomeUpdate,

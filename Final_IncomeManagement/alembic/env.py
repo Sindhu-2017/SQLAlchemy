@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from app.database.base import Base
-from app.models.income_expense import Income,Expense
+from app.models.income import Income
+from app.models.expense import Expense
 from app.models.user import User
 
 from app.config.settings import get_settings
