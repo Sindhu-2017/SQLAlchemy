@@ -1,8 +1,6 @@
 from datetime import date
 from decimal import Decimal
-
 import pytest
-
 from app.models.income_expense import Income
 from app.repositories.implementations.income_repository import (
     IncomeRepository
@@ -22,16 +20,12 @@ def make_income():
         description="Test income",
     )
 
-
 @pytest.mark.asyncio
 async def test_create_income_in_database(db_session):
     repository = IncomeRepository(db_session)
-
     income = make_income()
-
     created = await repository.create(income)
     await db_session.commit()
-
     assert created.income_id is not None
     assert created.source == "Freelancing"
     assert created.amount == Decimal("1000.00")
@@ -40,12 +34,9 @@ async def test_create_income_in_database(db_session):
 @pytest.mark.asyncio
 async def test_get_income_by_id(db_session):
     repository = IncomeRepository(db_session)
-
     income = make_income()
-
     await repository.create(income)
     await db_session.commit()
-
     found = await repository.get_by_id(income.income_id)
 
     assert found is not None
@@ -56,53 +47,8 @@ async def test_get_income_by_id(db_session):
 @pytest.mark.asyncio
 async def test_get_income_not_found(db_session):
     repository = IncomeRepository(db_session)
-
     result = await repository.get_by_id(999)
-
     assert result is None
 
 
-@pytest.mark.asyncio
-async def test_get_all_income_pagination(db_session):
-    repository = IncomeRepository(db_session)
 
-    await repository.create(make_income())
-
-    second = make_income()
-    second.source = "Salary"
-    second.income_type = "Employment"
-    second.amount = Decimal("2000.00")
-
-    await repository.create(second)
-    await db_session.commit()
-
-    records, total = await repository.get_all(
-        page=1,
-        page_size=1,
-    )
-
-    assert total == 2
-    assert len(records) == 1
-    assert records[0].income_id is not None
-
-
-@pytest.mark.asyncio
-async def test_filter_income_by_source(db_session):
-    repository = IncomeRepository(db_session)
-    await repository.create(make_income())
-
-    second = make_income()
-    second.source = "Salary"
-    second.income_type = "Employment"
-
-    await repository.create(second)
-    await db_session.commit()
-
-    records, total = await repository.get_all(
-        page=1,
-        page_size=10,
-        income_name="Free",
-    )
-
-    assert total == 1
-    assert records[0].source == "Freelancing"

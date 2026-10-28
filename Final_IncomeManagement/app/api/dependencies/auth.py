@@ -2,7 +2,6 @@ from typing import Annotated
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-
 from app.core.security import decode_token
 from app.api.dependencies.service_dependecies import get_auth_service
 from app.models.user import User
@@ -39,9 +38,9 @@ async def get_current_user(
         AuthenticationError,
         ValueError,
         TypeError,
-        KeyError,
-    ) as exc:
-        raise credentials_error from exc
+        KeyError
+    ):
+        raise credentials_error
 
 
 def require_roles(*allowed_roles: str):

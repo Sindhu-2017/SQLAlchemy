@@ -31,13 +31,13 @@ def create_access_token(
         "role": role,
         "type": "access",
         "iat": now,
-        "exp": expires_at,
+        "exp": expires_at
     }
 
     return jwt.encode(
         payload,
         settings.JWT_SECRET_KEY.get_secret_value(),
-        algorithm=settings.JWT_ALGORITHM,
+        algorithm=settings.JWT_ALGORITHM
     )
 
 
@@ -53,5 +53,5 @@ def decode_token(token: str) -> dict[str, Any]:
                 "iat",
                 "type",
             ],
-        },
+        }
     )

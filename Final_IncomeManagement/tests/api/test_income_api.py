@@ -1,17 +1,12 @@
-
 from datetime import date
 from decimal import Decimal
-
 import pytest
-
 from app.models.user import User
 from app.core.security import create_access_token
-
 
 @pytest.mark.asyncio
 async def test_home_endpoint(client):
     response = await client.get("/")
-
     assert response.status_code == 200
     assert response.json() == {
         "message": "Income and Expense API is running"
@@ -21,28 +16,22 @@ async def test_home_endpoint(client):
 @pytest.mark.asyncio
 async def test_get_income_without_token_returns_401(client):
     response = await client.get("/api/income/")
-
     assert response.status_code == 401
-    assert response.json()["detail"] == (
-        "Not authenticated"
-    )
+    assert response.json()["detail"] == ("Not authenticated")
 
 
 @pytest.mark.asyncio
 async def test_get_income_with_invalid_token_returns_401(client):
-    response = await client.get(
-        "/api/income/",
+    response = await client.get("/api/income/",
         headers={
             "Authorization": "Bearer invalid-token"
-        },
+        }
     )
-
     assert response.status_code == 401
 
 
 @pytest.mark.asyncio
 async def test_create_income_as_admin(client, db_session):
-    # Create an admin user in the test database.
     admin = User(
         username="testadmin",
         email="admin@example.com",
@@ -55,10 +44,9 @@ async def test_create_income_as_admin(client, db_session):
     await db_session.commit()
     await db_session.refresh(admin)
 
-    # Generate a valid access token for this admin.
     token = create_access_token(
         user_id=admin.user_id,
-        role=admin.role,
+        role=admin.role
     )
 
     headers = {
@@ -78,11 +66,9 @@ async def test_create_income_as_admin(client, db_session):
     response = await client.post(
         "/api/income/",
         json=payload,
-        headers=headers,
+        headers=headers
     )
-
     assert response.status_code == 201
-
     body = response.json()
 
     assert body["source"] == "Freelancing"
@@ -105,11 +91,9 @@ async def test_create_income_as_regular_user_is_forbidden(
         role="user",
         is_active=True,
     )
-
     db_session.add(user)
     await db_session.commit()
     await db_session.refresh(user)
-
     token = create_access_token(
         user_id=user.user_id,
         role=user.role,
@@ -127,7 +111,6 @@ async def test_create_income_as_regular_user_is_forbidden(
         },
         headers={
             "Authorization": f"Bearer {token}"
-        },
+        }
     )
-
     assert response.status_code == 403

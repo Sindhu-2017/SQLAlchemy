@@ -1,6 +1,5 @@
 from decimal import Decimal
 from unittest.mock import AsyncMock, Mock
-
 import pytest
 
 from app.services.income_service import IncomeService
@@ -81,10 +80,8 @@ async def test_get_income_success(service):
     service.repository.get_by_id = AsyncMock(
         return_value=expected_income
     )
-
     result = await service.get_income(1)
     assert result.income_id == 1
-
     service.repository.get_by_id.assert_awaited_once_with(1)
 
 
@@ -93,8 +90,6 @@ async def test_get_income_not_found(service):
     service.repository.get_by_id = AsyncMock(
         return_value=None
     )
-
     with pytest.raises(IncomeNotFoundError):
         await service.get_income(999)
-
     service.repository.get_by_id.assert_awaited_once_with(999)

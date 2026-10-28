@@ -1,6 +1,5 @@
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.models.user import User
 from app.repositories.interfaces.user_repository import (
     UserRepositoryInterface,
@@ -13,7 +12,7 @@ class UserRepository(UserRepositoryInterface):
 
     async def get_by_id(
         self,
-        user_id: int,
+        user_id: int
     ) -> User | None:
         result = await self.db.execute(
             select(User).where(User.user_id == user_id)
@@ -22,7 +21,7 @@ class UserRepository(UserRepositoryInterface):
 
     async def get_by_username(
         self,
-        username: str,
+        username: str
     ) -> User | None:
         result = await self.db.execute(
             select(User).where(User.username == username)
@@ -32,10 +31,9 @@ class UserRepository(UserRepositoryInterface):
     async def get_by_username_or_email(
         self,
         username: str | None = None,
-        email: str | None = None,
+        email: str | None = None
     ) -> User | None:
         conditions = []
-
         if username is not None:
             conditions.append(User.username == username)
 
@@ -52,7 +50,7 @@ class UserRepository(UserRepositoryInterface):
 
     async def create(
         self,
-        user: User,
+        user: User
     ) -> User:
         self.db.add(user)
         await self.db.flush()

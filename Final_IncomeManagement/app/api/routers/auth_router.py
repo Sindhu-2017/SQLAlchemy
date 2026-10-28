@@ -1,5 +1,4 @@
 from typing import Annotated
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -31,11 +30,10 @@ router = APIRouter(
 
 AuthServiceDependency = Annotated[AuthService,Depends(get_auth_service)]
 
-
 @router.post(
     "/register",
     response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_201_CREATED
 )
 async def register(
     data: RegisterRequest,
@@ -43,44 +41,39 @@ async def register(
 ) -> User:
     try:
         return await service.register(data)
-
-    except RegistrationConflict as exc:
+    except RegistrationConflict as err:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(exc),
-        ) from exc
+            detail=str(err),
+        )
 
 
 
 @router.post(
     "/login",
-    response_model=TokenResponse,
+    response_model=TokenResponse
 )
 async def login(
-    form_data: Annotated[
-        OAuth2PasswordRequestForm,
-        Depends(),
-    ],
-    service: AuthServiceDependency,
+    form_data: Annotated[OAuth2PasswordRequestForm,Depends()],
+    service: AuthServiceDependency
 ) -> dict[str, str]:
     try:
         return await service.login(
             username=form_data.username,
-            password=form_data.password,
+            password=form_data.password
         )
 
-    except AuthenticationError as exc:
+    except AuthenticationError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password.",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
-
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
 
 @router.get(
     "/me",
-    response_model=UserResponse,
+    response_model=UserResponse
 )
 async def get_me(
     current_user: Annotated[User,Depends(get_current_user)]
@@ -90,7 +83,7 @@ async def get_me(
 
 @router.get(
     "/token-info",
-    response_model=TokenInfoResponse,
+    response_model=TokenInfoResponse
 )
 async def get_token_info(
     current_user: Annotated[User,Depends(get_current_user)]
