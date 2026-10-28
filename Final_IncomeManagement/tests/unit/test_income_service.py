@@ -8,7 +8,6 @@ from app.exceptions.income_exceptions import (
     InvalidIncomeOperationError
 )
 
-
 @pytest.fixture
 def service():
     # mock all external dependencies

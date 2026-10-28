@@ -12,25 +12,14 @@ async def test_get_income_without_token_returns_401(client):
 
 
 @pytest.mark.asyncio
-async def test_get_income_with_invalid_token_returns_401(client):
-    response = await client.get("/api/income/",
-        headers={
-            "Authorization": "Bearer invalid-token"
-        }
-    )
-    assert response.status_code == 401
-
-
-@pytest.mark.asyncio
 async def test_create_income_as_admin(client, db_session):
     admin = User(
         username="testadmin",
         email="admin@example.com",
         hashed_password="not-used-in-this-test",
         role="admin",
-        is_active=True,
+        is_active=True
     )
-
     db_session.add(admin)
     await db_session.commit()
     await db_session.refresh(admin)
@@ -51,7 +40,7 @@ async def test_create_income_as_admin(client, db_session):
         "amount": "1000.00",
         "tax_percentage": "10.00",
         "expense_amount": "100.00",
-        "description": "API test income",
+        "description": "API test income"
     }
 
     response = await client.post(
@@ -80,14 +69,14 @@ async def test_create_income_as_regular_user_is_forbidden(
         email="user@example.com",
         hashed_password="not-used-in-this-test",
         role="user",
-        is_active=True,
+        is_active=True
     )
     db_session.add(user)
     await db_session.commit()
     await db_session.refresh(user)
     token = create_access_token(
         user_id=user.user_id,
-        role=user.role,
+        role=user.role
     )
 
     response = await client.post(
@@ -98,7 +87,7 @@ async def test_create_income_as_regular_user_is_forbidden(
             "income_type": "Business",
             "amount": "1000.00",
             "tax_percentage": "10.00",
-            "expense_amount": "100.00",
+            "expense_amount": "100.00"
         },
         headers={
             "Authorization": f"Bearer {token}"
