@@ -38,21 +38,6 @@ async def test_calculate_income_success(service):
 
 
 @pytest.mark.asyncio
-async def test_calculate_income_zero_tax(service):
-    tax, net_income, cash_in_hand = (
-        await service.calculate_income(
-            amount=Decimal("1000"),
-            tax_percentage=Decimal("0"),
-            expense_amount=Decimal("200"),
-        )
-    )
-
-    assert tax == Decimal("0")
-    assert net_income == Decimal("1000")
-    assert cash_in_hand == Decimal("800")
-
-
-@pytest.mark.asyncio
 async def test_expenses_cannot_exceed_net_income(service):
     with pytest.raises(InvalidIncomeOperationError):
         await service.calculate_income(

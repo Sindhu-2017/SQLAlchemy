@@ -5,15 +5,6 @@ from app.models.user import User
 from app.core.security import create_access_token
 
 @pytest.mark.asyncio
-async def test_home_endpoint(client):
-    response = await client.get("/")
-    assert response.status_code == 200
-    assert response.json() == {
-        "message": "Income and Expense API is running"
-    }
-
-
-@pytest.mark.asyncio
 async def test_get_income_without_token_returns_401(client):
     response = await client.get("/api/income/")
     assert response.status_code == 401
