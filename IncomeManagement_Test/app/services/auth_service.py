@@ -57,7 +57,7 @@ class AuthService:
         except IntegrityError:
             await self.db.rollback()
             raise RegistrationConflict(
-                "Username or email is already registered."
+                "Username or email is already registered"
             )
 
         except Exception:
