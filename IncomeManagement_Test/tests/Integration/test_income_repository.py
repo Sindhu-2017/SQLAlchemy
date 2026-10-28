@@ -17,7 +17,7 @@ def make_income():
         expense_amount=Decimal("0.00"),
         net_income=Decimal("900.00"),
         cash_in_hand=Decimal("900.00"),
-        description="Test income",
+        description="Test income"
     )
 
 @pytest.mark.asyncio

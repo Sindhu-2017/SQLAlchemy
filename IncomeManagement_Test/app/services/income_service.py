@@ -19,16 +19,16 @@ from app.repositories.interfaces.repositories import (
 class IncomeService:
     def __init__(
             self,db:Session,
-            repository:IncomeRepositoryInterface,
+            income_repository:IncomeRepositoryInterface,
             expense_repository:ExpenseRepositoryInterface
     ):
-        self.repository = repository
+        self.income_repository = income_repository
         self.expense_repository = expense_repository
         self.db=db
 
     # get all incomes
     async def get_incomes(self,page: int,page_size: int,income_name: str | None = None) -> dict:
-        records, total = await self.repository.get_all(
+        records, total = await self.income_repository.get_all(
             page=page,
             page_size=page_size,
             income_name=income_name
@@ -52,7 +52,7 @@ class IncomeService:
 
     # get income based on income_id
     async def get_income(self, income_id: int) -> Income:
-        income =await self.repository.get_by_id(income_id)
+        income =await self.income_repository.get_by_id(income_id)
         if income is None:
             raise IncomeNotFoundError(income_id)
         return income
@@ -90,7 +90,7 @@ class IncomeService:
         )
 
         try:
-            await self.repository.create(income)
+            await self.income_repository.create(income)
             await self.db.commit()
             await self.db.refresh(income)
             return income
@@ -113,7 +113,7 @@ class IncomeService:
         try:
             for field, value in changes.items():
                 setattr(income, field, value)
-            await self.repository.update(income)
+            await self.income_repository.update(income)
             await self.db.commit()
             await self.db.refresh(income)
             return income
@@ -147,7 +147,7 @@ class IncomeService:
             for field, value in changes.items():
                 setattr(income, field, value)
 
-            await self.repository.update(income)
+            await self.income_repository.update(income)
             await self.db.commit()
             await self.db.refresh(income)
             return income
@@ -160,7 +160,7 @@ class IncomeService:
     async def delete_income(self, income_id: int) -> dict:
         income =await self.get_income(income_id)
         try:
-            await self.repository.delete(income)
+            await self.income_repository.delete(income)
             await self.db.commit()      
             return {
                 "message" : "Income data deleted successfully"
@@ -196,6 +196,6 @@ class IncomeService:
 
     # income summary
     async def get_income_summary(self,min_expense: Decimal | None = None) -> list[dict]:
-        return await self.repository.get_income_summary(min_expense)
+        return await self.income_repository.get_income_summary(min_expense)
 
     
