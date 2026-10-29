@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 
 from fastapi import (
@@ -27,6 +28,8 @@ from app.services.auth_service import (
 )
 
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix="/api/auth",
     tags=["Authentication"],
@@ -48,6 +51,7 @@ async def register(
         return await service.register(data)
 
     except RegistrationConflict as exc:
+        logger.warning("Registration rejected: username or email conflict")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(exc),
@@ -69,6 +73,7 @@ async def login(
         )
 
     except AuthenticationError as exc:
+        logger.warning("Login rejected: invalid credentials or inactive account")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password.",
@@ -88,6 +93,7 @@ async def refresh_token(
         return await service.refresh(data.refresh_token)
 
     except AuthenticationError as exc:
+        logger.warning("Refresh request rejected: invalid or expired token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token.",
@@ -111,6 +117,7 @@ async def logout(
         )
 
     except AuthenticationError as exc:
+        logger.warning("Logout rejected: refresh token could not be validated")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token.",

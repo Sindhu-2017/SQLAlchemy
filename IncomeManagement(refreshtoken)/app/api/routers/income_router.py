@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 from fastapi import (
     APIRouter,
@@ -35,6 +36,8 @@ from app.exceptions.income_exceptions import(
 from app.api.dependencies.service_dependecies import get_income_service
 from app.api.dependencies.auth import require_roles
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix = "/api/income",
     tags = ["Income"]
@@ -71,6 +74,7 @@ async def get_one_income(
     try:
         return await service.get_income(income_id)
     except IncomeNotFoundError as err:
+        logger.warning("Income lookup rejected: income_id=%s not found", income_id)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err)
@@ -92,6 +96,7 @@ async def create_income(
         return await service.create_income(data)
 
     except InvalidIncomeOperationError as err:
+        logger.warning("Income creation rejected: %s", str(err))
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(err)
@@ -111,12 +116,14 @@ async def update_income(
     try:
         return await service.update_income(income_id, data)
     except IncomeNotFoundError as err:
+        logger.warning("Income update rejected: income_id=%s not found", income_id)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err)
         ) from err
 
     except InvalidIncomeOperationError as err:
+        logger.warning("Income update rejected: %s", str(err))
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(err)
@@ -137,12 +144,14 @@ async def patch_income(
     try:
         return await service.patch_income(income_id, data)
     except IncomeNotFoundError as err:
+        logger.warning("Income patch rejected: income_id=%s not found", income_id)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err)
         )
 
     except InvalidIncomeOperationError as err:
+        logger.warning("Income patch rejected: %s", str(err))
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str(err)
@@ -161,6 +170,7 @@ async def delete_income(
     try:
         return await service.delete_income(income_id)
     except IncomeNotFoundError as err:
+        logger.warning("Income deletion rejected: income_id=%s not found", income_id)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err)
