@@ -1,6 +1,10 @@
 from decimal import Decimal
 from sqlalchemy.orm import Session
-from app.models.income_expense import Income, Expense
+from sqlalchemy.exc import IntegrityError,SQLAlchemyError
+import logging
+
+from app.models.income import Income
+from app.models.expense import Expense
 
 from app.schemas.expense import ExpenseCreate, ExpensePatch
 from app.exceptions.income_exceptions import (
@@ -11,7 +15,6 @@ from app.repositories.interfaces.repositories import (
     IncomeRepositoryInterface,
     ExpenseRepositoryInterface,
 )
-
 class ExpenseService:
     def __init__(
             self, db: Session,
@@ -86,7 +89,13 @@ class ExpenseService:
                 "expense_amount": income.expense_amount,
                 "cash_in_hand": income.cash_in_hand,
             }
-        except Exception:
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 
@@ -127,7 +136,13 @@ class ExpenseService:
                 "expense_amount": income.expense_amount,
                 "cash_in_hand": income.cash_in_hand,
             }
-        except Exception:
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 
@@ -148,7 +163,13 @@ class ExpenseService:
                 "expense_amount": income.expense_amount,
                 "cash_in_hand": income.cash_in_hand,
             }
-        except Exception:
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 

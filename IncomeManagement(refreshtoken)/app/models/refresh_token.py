@@ -7,12 +7,17 @@ from sqlalchemy import (
     String,
     func,
     text,
+    CheckConstraint
 )
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database.base import Base
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
+
+    __table_args__ = (
+        CheckConstraint("expires_at > created_at",name="ck_refresh_token_expiry_after_creation"),
+    )
 
     id: Mapped[int] = mapped_column(
         Integer,

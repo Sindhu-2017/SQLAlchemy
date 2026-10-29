@@ -2,6 +2,7 @@ from typing import Any
 import jwt
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError,OperationalError,SQLAlchemyError
 
 from app.core.security import (
     create_access_token,
@@ -62,12 +63,13 @@ class AuthService:
             await self.db.commit()
             await self.db.refresh(user)
             return user
-        except IntegrityError as exc:
+        except IntegrityError:
             await self.db.rollback()
             raise RegistrationConflict(
                 "Username or email is already registered."
-            ) from exc
-        except Exception:
+            )
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 
@@ -139,6 +141,15 @@ class AuthService:
             )
             await self.db.commit()
             return tokens
+
+        except OperationalError:
+            await self.db.rollback()
+            raise
+
+        except SQLAlchemyError:
+            await self.db.rollback()
+            raise
+
         except Exception:
             await self.db.rollback()
             raise

@@ -1,8 +1,8 @@
-"""adding user and refresh token table
+"""creating tables
 
-Revision ID: ac1d986e082a
-Revises: 9cfe3958e30f
-Create Date: 2026-10-26 10:44:45.610257
+Revision ID: ba3ba75858b6
+Revises: 
+Create Date: 2026-10-29 10:20:30.399443
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ac1d986e082a'
-down_revision: Union[str, Sequence[str], None] = '9cfe3958e30f'
+revision: str = 'ba3ba75858b6'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -33,6 +33,17 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
+    op.create_table('expense',
+    sa.Column('expense_id', sa.Integer(), nullable=False),
+    sa.Column('income_id', sa.Integer(), nullable=False),
+    sa.Column('expense_name', sa.VARCHAR(length=100), nullable=False),
+    sa.Column('payment_method', sa.VARCHAR(length=30), nullable=False),
+    sa.Column('amount', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('expense_date', sa.Date(), nullable=False),
+    sa.ForeignKeyConstraint(['income_id'], ['income.income_id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('expense_id')
+    )
     op.create_table('refresh_tokens',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('jti', sa.String(length=36), nullable=False),
@@ -55,6 +66,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_refresh_tokens_user_id'), table_name='refresh_tokens')
     op.drop_index(op.f('ix_refresh_tokens_jti'), table_name='refresh_tokens')
     op.drop_table('refresh_tokens')
+    op.drop_table('expense')
     op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')

@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 from decimal import Decimal
+from sqlalchemy.exc import SQLAlchemyError,IntegrityError
 
 from app.exceptions.income_exceptions import (
     IncomeNotFoundError,
     InvalidIncomeOperationError
 )
-from app.models.income_expense import Income
+from app.models.income import Income
 from app.schemas.income import (
     IncomeCreate,
     IncomeUpdate,
@@ -16,6 +17,8 @@ from app.repositories.interfaces.repositories import (
     IncomeRepositoryInterface,
     ExpenseRepositoryInterface
 )
+
+
 class IncomeService:
     def __init__(
             self,db:Session,
@@ -94,7 +97,15 @@ class IncomeService:
             await self.db.commit()
             await self.db.refresh(income)
             return income
-        except Exception:
+        
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+        
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 
@@ -117,7 +128,13 @@ class IncomeService:
             await self.db.commit()
             await self.db.refresh(income)
             return income
-        except Exception:
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 
@@ -151,7 +168,13 @@ class IncomeService:
             await self.db.commit()
             await self.db.refresh(income)
             return income
-        except Exception:
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 
@@ -165,7 +188,14 @@ class IncomeService:
             return {
                 "message" : "Income data deleted successfully"
             }      
-        except Exception:
+        except IntegrityError:
+            await self.db.rollback()
+            raise InvalidIncomeOperationError(
+                "The income operation violates a database constraint."
+            )
+
+
+        except SQLAlchemyError:
             await self.db.rollback()
             raise
 

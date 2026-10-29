@@ -1,7 +1,8 @@
 from typing import Annotated
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+# from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer,HTTPAuthorizationCredentials
 
 from app.core.security import decode_token
 from app.api.dependencies.service_dependecies import get_auth_service
@@ -12,19 +13,25 @@ from app.services.auth_service import (
 )
 
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/auth/login"
-)
+# oauth2_scheme = OAuth2PasswordBearer(
+#     tokenUrl="/api/auth/login"
+# )
+bearer_scheme = HTTPBearer()
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
     service: Annotated[AuthService, Depends(get_auth_service)],
+    credentials :HTTPAuthorizationCredentials = Depends(bearer_scheme)
 ) -> User:
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials.",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    if credentials is None :
+        raise credentials_error
+    
+    token = credentials.credentials
 
     try:
         payload = decode_token(token)

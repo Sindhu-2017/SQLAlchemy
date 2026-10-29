@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from decimal import Decimal
-from app.models.income_expense import Income, Expense
+from app.models.income import Income
+from app.models.expense import Expense
 
 # income
 class IncomeRepositoryInterface(ABC):

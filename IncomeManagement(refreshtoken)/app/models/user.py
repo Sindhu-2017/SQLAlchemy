@@ -3,7 +3,8 @@ from sqlalchemy import (
     Integer,
     String,
     func,
-    DateTime
+    DateTime,
+    CheckConstraint
 )
 from sqlalchemy.orm import Mapped,mapped_column
 from datetime import datetime
@@ -38,6 +39,7 @@ class User(Base):
 
     role: Mapped[str] = mapped_column(
         String(20),
+        CheckConstraint("role IN ('admin','user')"),
         default="user",
         server_default="user",
         nullable=False,
