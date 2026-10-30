@@ -52,6 +52,13 @@ class ExpenseRepository(ExpenseRepositoryInterface):
     # creating expense data using stored procedure
     async def create(self, expense: Expense) -> Expense:
         try:
+            # testing purpose 
+            dialect_name = self.db.get_bind().dialect.name
+            if dialect_name == "sqlite":
+                self.db.add(expense)
+                await self.db.flush()
+                return expense
+            
             statement = text("""
                 CALL create_expense(
                     :p_income_id,

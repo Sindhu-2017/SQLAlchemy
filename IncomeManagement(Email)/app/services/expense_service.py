@@ -79,12 +79,14 @@ class ExpenseService:
             await self.expense_repository.create(expense)
             await self.recalculate_income(income)
             await self.db.commit()
+            expense_id = expense.expense_id
+            income_id = income.income_id
             await self.db.refresh(income)
 
             return {
                 "message": "Expense added successfully",
-                "expense_id": expense.expense_id,
-                "income_id": income.income_id,
+                "expense_id": expense_id,
+                "income_id": income_id,
                 "expense_amount": income.expense_amount,
                 "cash_in_hand": income.cash_in_hand,
             }

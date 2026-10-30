@@ -1,5 +1,4 @@
 import pytest_asyncio
-
 from datetime import date
 from decimal import Decimal
 
@@ -12,7 +11,6 @@ from app.core.security import create_access_token
 
 @pytest_asyncio.fixture
 async def admin_headers(db_session):
-
     admin = User(
         username="testadmin",
         email="admin@example.com",
@@ -24,7 +22,6 @@ async def admin_headers(db_session):
     db_session.add(admin)
     await db_session.commit()
     await db_session.refresh(admin)
-
     token = create_access_token(
         user_id=admin.user_id,
         role=admin.role
@@ -37,7 +34,6 @@ async def admin_headers(db_session):
 
 @pytest_asyncio.fixture
 async def user_headers(db_session):
-
     user = User(
         username="testuser",
         email="user@example.com",
@@ -45,16 +41,13 @@ async def user_headers(db_session):
         role="user",
         is_active=True
     )
-
     db_session.add(user)
     await db_session.commit()
     await db_session.refresh(user)
-
     token = create_access_token(
         user_id=user.user_id,
         role=user.role
     )
-
     return {
         "Authorization": f"Bearer {token}"
     }
@@ -62,7 +55,6 @@ async def user_headers(db_session):
 
 @pytest_asyncio.fixture
 async def income_record(db_session):
-
     income = Income(
         income_date=date.today(),
         source="Freelancing",
@@ -85,7 +77,6 @@ async def income_record(db_session):
 
 @pytest_asyncio.fixture
 async def expense_record(db_session, income_record):
-
     expense = Expense(
         income_id=income_record.income_id,
         expense_name="Electricity Bill",
@@ -94,9 +85,7 @@ async def expense_record(db_session, income_record):
         expense_date=date.today(),
         description="Test expense"
     )
-
     db_session.add(expense)
     await db_session.commit()
     await db_session.refresh(expense)
-
     return expense

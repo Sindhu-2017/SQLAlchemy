@@ -1,6 +1,5 @@
 from datetime import date
 from decimal import Decimal
-
 import pytest
 
 from app.services.email_service import EmailSender
@@ -28,13 +27,8 @@ async def test_get_income_by_id(client,admin_headers,income_record):
 
 # Create income
 @pytest.mark.asyncio
-async def test_create_income_as_admin(
-    client,
-    admin_headers,
-    monkeypatch
-):
-
-    # Prevent sending a real email during testing
+async def test_create_income_as_admin(client,admin_headers,monkeypatch):
+    # prevent sending a real email during testing
     async def skip_email(self, receiver, income):
         return False
 
@@ -73,11 +67,7 @@ async def test_create_income_as_admin(
 
 # Update income
 @pytest.mark.asyncio
-async def test_update_income(
-    client,
-    admin_headers,
-    income_record
-):
+async def test_update_income(client,admin_headers,income_record):
 
     payload = {
         "income_date": date.today().isoformat(),
@@ -107,12 +97,7 @@ async def test_update_income(
 
 # Patch income
 @pytest.mark.asyncio
-async def test_patch_income(
-    client,
-    admin_headers,
-    income_record
-):
-
+async def test_patch_income(client,admin_headers,income_record):
     response = await client.patch(
         f"/api/income/{income_record.income_id}",
         json={"source": "Part-time"},
@@ -125,34 +110,22 @@ async def test_patch_income(
 
 # Delete income
 @pytest.mark.asyncio
-async def test_delete_income(
-    client,
-    admin_headers,
-    income_record
-):
-
+async def test_delete_income(client,admin_headers,income_record):
     response = await client.delete(
         f"/api/income/{income_record.income_id}",
         headers=admin_headers
     )
-
     assert response.status_code == 200
     assert response.json()["message"] == "Income data deleted successfully"
 
 
 # Income and expense inner join
 @pytest.mark.asyncio
-async def test_income_expenses_inner_join(
-    client,
-    admin_headers,
-    expense_record
-):
-
+async def test_income_expenses_inner_join(client,admin_headers,expense_record):
     response = await client.get(
         "/api/income/reports/inner-join",
         headers=admin_headers
     )
-
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["source"] == "Freelancing"
@@ -160,11 +133,7 @@ async def test_income_expenses_inner_join(
 
 # Income summary
 @pytest.mark.asyncio
-async def test_income_summary(
-    client,
-    admin_headers,
-    income_record
-):
+async def test_income_summary(client,admin_headers, income_record):
     response = await client.get(
         "/api/income/reports/summary",
         headers=admin_headers
@@ -183,10 +152,7 @@ async def test_get_income_without_token_returns_401(client):
 
 # Authorization test
 @pytest.mark.asyncio
-async def test_create_income_as_regular_user_is_forbidden(
-    client,
-    user_headers
-):
+async def test_create_income_as_regular_user_is_forbidden(client,user_headers):
 
     payload = {
         "income_date": date.today().isoformat(),
@@ -196,11 +162,9 @@ async def test_create_income_as_regular_user_is_forbidden(
         "tax_percentage": "10.00",
         "expense_amount": "0.00"
     }
-
     response = await client.post(
         "/api/income/",
         json=payload,
         headers=user_headers
     )
-
     assert response.status_code == 403
