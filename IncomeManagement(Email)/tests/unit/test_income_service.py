@@ -13,11 +13,14 @@ def service():
     db = Mock()
     income_repository = Mock()
     expense_repository = Mock()
+    email_sender = Mock()
+
 
     return IncomeService(
         db=db,
         income_repository=income_repository,
         expense_repository=expense_repository,
+        email_sender=email_sender
     )
 
 @pytest.mark.asyncio

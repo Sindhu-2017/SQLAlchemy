@@ -6,7 +6,7 @@ from app.api.routers.expense_router import router as expense_router
 from app.api.routers.auth_router import router as auth_router
 
 from app.middleware.observability import ObservabilityMiddleware
-from app.api.routers.health_router import router as health_router
+from app.api.routers.health_routes import router as health_router
 
 
 logger = logging.getLogger(__name__)

@@ -27,7 +27,7 @@ async def get_income_service(
 ) -> IncomeService:
     return IncomeService(
         db=db,
-        repository=IncomeRepository(db),
+        income_repository=IncomeRepository(db),
         expense_repository=ExpenseRepository(db),
         email_sender=EmailSender()
     )
